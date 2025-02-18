@@ -7,7 +7,7 @@
 read_pa(path, timezoneval)
 }
 \arguments{
-\item{path}{the path to the PurpleAir data.}
+\item{path}{the path to the PurpleAir data (folder of csv files).}
 
 \item{timezoneval}{the timezone local to where the PurpleAir data was collected.
 To get the list of all timezone names, use OlsonNames().}

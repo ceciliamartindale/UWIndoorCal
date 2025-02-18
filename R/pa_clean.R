@@ -1,6 +1,6 @@
 #' Read in PurpleAir files
 #'
-#' @param path the path to the PurpleAir data.
+#' @param path the path to the PurpleAir data (folder of csv files).
 #' @param timezoneval the timezone local to where the PurpleAir data was collected.
 #'     To get the list of all timezone names, use OlsonNames().
 #'
@@ -169,9 +169,6 @@ pa_timeseries <- function(data, timescale, channela=NULL, channelb=NULL) {
     ggplot2::theme(axis.title.y = ggplot2::element_text(vjust = 0.5)) +
     ggplot2::facet_wrap(~mac_address)
 }
-## include averaging the count channels,
-#averaging the cf channels
-
 
 #' Prepare PurpleAir data for calibration
 #'
@@ -207,9 +204,9 @@ prep_pa_data <- function(data, channel=NULL, low_threshold=NULL, high_threshold=
 
   channelspa = colnames(data)[13:40]
 
-  data <- data[,datetime5 := lubridate::ceiling_date(datetime, avgtime)]
+  data <- data[,datetimehr := lubridate::ceiling_date(datetime, avgtime)]
   data <- data[, lapply(.SD, mean, na.rm = TRUE),
-                                  by = c("mac_address", "datetime5"),
+                                  by = c("mac_address", "datetimehr"),
                                   .SDcols = c("current_dewpoint_f",
                                               "current_temp_f",
                                               "current_humidity",
