@@ -2,7 +2,7 @@
 % Please edit documentation in R/pa_clean.R
 \name{pa_timeseries}
 \alias{pa_timeseries}
-\title{Title}
+\title{Plot time series of A and B channels}
 \usage{
 pa_timeseries(data, timescale, channela = NULL, channelb = NULL)
 }
@@ -19,7 +19,7 @@ pa_timeseries(data, timescale, channela = NULL, channelb = NULL)
 timeseries plots of channel A and channel B on the same plot
 }
 \description{
-Title
+Plot time series of A and B channels
 }
 \examples{
 pa_timeseries(pa_data, "1 month")

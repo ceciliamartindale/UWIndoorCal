@@ -2,12 +2,12 @@
 % Please edit documentation in R/pa_clean.R
 \name{pa_corr_plot}
 \alias{pa_corr_plot}
-\title{Title}
+\title{Plot correlation of A and B channels}
 \usage{
 pa_corr_plot(data, channela = NULL, channelb = NULL)
 }
 \arguments{
-\item{data}{dataframe containing PurpleAir data}
+\item{data}{dataframe containing PurpleAir data.}
 
 \item{channela}{channel A variable, default is pm2_5_cf_1.}
 
@@ -17,7 +17,7 @@ pa_corr_plot(data, channela = NULL, channelb = NULL)
 plot of correlation of A and B channels.
 }
 \description{
-Title
+Plot correlation of A and B channels
 }
 \examples{
 pa_corr_plot(pa_data)

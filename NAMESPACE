@@ -3,6 +3,7 @@
 export(pa_corr_ab)
 export(pa_corr_plot)
 export(pa_timeseries)
+export(prep_pa_data)
 export(read_pa)
 import(rlang)
 importFrom(data.table,":=")

@@ -99,7 +99,7 @@ pa_corr_ab <- function(data, channela=NULL, channelb=NULL, threshold=NULL, datet
 
 #' Plot correlation of A and B channels
 #'
-#' @param data dataframe containing PurpleAir data
+#' @param data dataframe containing PurpleAir data.
 #' @param channela channel A variable, default is pm2_5_cf_1.
 #' @param channelb channel B variable, default is pm2_5_cf_1_b.
 #'
@@ -172,24 +172,77 @@ pa_timeseries <- function(data, timescale, channela=NULL, channelb=NULL) {
 ## include averaging the count channels,
 #averaging the cf channels
 
-## could include a function to filter out obvious high points and filter out
-# < 2 data for calibration, make sure there is no NA humidity
-prep_pa_data <- function(data, channel, low_threshold=NULL, high_threshold=NULL, avgtime=NULL) {
-  if(is.na(low_threshold)) (low_threshold=2)
-  if(is.na(high_threshold)) (high_threshold=500)
-  if(is.na(avgtime)) (avgtime="60 min")
-  channelspa = colnames(data)[13:40]
-  # NEED TO CHECK IF THIS NEEDS TO CHANGE
 
-  data <- data %>% filter(channel > low_threshold) %>% filter(channel < high_threshold) %>%
-    filter(!is.na(current_humidity))
-  data <- data[,datetime5 := ceiling_date(datetime, avgtime)]
-  data <- data[ , mean_PMchannel := mean(channel, na.rm = T), by = datetime5]
+#' Prepare PurpleAir data for calibration
+#'
+#' @param data PurpleAir data in a dataframe. This function assumes that the order
+#'   of the PurpleAir columns has not been modified. Columns can have been added
+#'   to the end, but the default PurpleAir export should not have changed.
+#' @param channel Channel to filter data based on. The default is pm2_5_cf_ave,
+#'   the averaged cf PM2.5 channel. We recommend using an averaged column such
+#'   as pm2_5_atm_ave, pm2_5_cf_ave, or pm2.5_aqi_cf_ave.
+#' @param low_threshold Lower threshold to filter out. Default is 2 ug/m^3 because
+#'   this is the limit of detection for (QUESTION: regulatory or PA??) monitors.
+#'   We recommend inspecting your data well to determine an appropriate threshold
+#'   value for cleaning.
+#' @param high_threshold Higher threshold to filter out. Default is 500
+#'   because it is uncommon to have legitimate values above 500 ug/m^3 outside of
+#'   periods of high smoke. We recommend inspecting your data well to determine
+#'   an appropriate threshold value for cleaning.
+#' @param avgtime time period to average measurements over. The default is 60 minutes,
+#'  which provides hourly air quality measurements.
+#'
+#' @returns a dataframe of PurpleAir data ready for calibration. Data should still
+#'  be thoroughly expected for agreement between a and b channels and obvious dysfunction.
+#' @export
+#'
+#' @examples
+#' pa_data_cal <- prep_pa_data(pa_data)
+#' pa_data_cal <- prep_pa_data(pa_data, channel="pm2.5_aqi_cf_ave", low_threshold=0,
+#'  high_threshold=300)
+prep_pa_data <- function(data, channel=NULL, low_threshold=NULL, high_threshold=NULL, avgtime=NULL) {
+  if(is_null(low_threshold)) (low_threshold=2)
+  if(is_null(high_threshold)) (high_threshold=500)
+  if(is_null(avgtime)) (avgtime="60 min")
+
+  channelspa = colnames(data)[13:40]
+
+  data <- data[,datetime5 := lubridate::ceiling_date(datetime, avgtime)]
   data <- data[, lapply(.SD, mean, na.rm = TRUE),
                                   by = c("mac_address", "datetime5"),
                                   .SDcols = c("current_dewpoint_f",
                                               "current_temp_f",
                                               "current_humidity",
                                               "pressure",
-                                              "mean_PMchannel", channelspa)]
+                                               channelspa)]
+
+  #avg all the channels - edit this to be averaging
+  data <- data %>% dplyr::mutate(pm2_5_cf_ave=(pm2_5_cf_1+pm2_5_cf_1_b)/2,
+                                 pm10_0_cf_ave=(pm10_0_cf_1+pm10_0_cf_1_b)/2,
+                                 pm2_5_atm_ave=(pm2_5_atm+pm2_5_atm_b)/2,
+                                 pm10_0_atm=(pm10_0_atm+pm10_0_atm_b)/2,
+                                 pm2.5_aqi_cf_ave=(pm2.5_aqi_cf_1+pm2.5_aqi_cf_1_b)/2,
+                                 pm2.5_aqi_atm_ave=(pm2.5_aqi_atm+pm2.5_aqi_atm_b)/2,
+                                 pm1_0_cf_ave = (pm1_0_cf_1+pm1_0_cf_1_b)/2,
+                                 pm1_0_atm_ave = (pm1_0_atm+pm1_0_atm_b)/2,
+                                 p_0_3_um_ave = (p_0_3_um+p_0_3_um_b)/2,
+                                 p_0_5_um_ave = (p_0_5_um+p_0_5_um_b)/2,
+                                 p_1_0_um_ave = (p_1_0_um+p_1_0_um_b)/2,
+                                 p_2_5_um_ave = (p_2_5_um+p_2_5_um_b)/2,
+                                 p_5_0_um_ave = (p_5_0_um+p_5_0_um_b)/2,
+                                 p_10_0_um_ave = (p_10_0_um+p_10_0_um_b)/2) %>%
+    select(-c(pm2_5_cf_1, pm2_5_cf_1_b, pm10_0_cf_1, pm10_0_cf_1_b,
+              pm2_5_atm, pm2_5_atm_b, pm10_0_atm, pm10_0_atm_b, pm2.5_aqi_cf_1,
+              pm2.5_aqi_cf_1_b, pm2.5_aqi_atm, pm2.5_aqi_atm_b, pm1_0_cf_1,
+              pm1_0_cf_1_b, pm1_0_atm, pm1_0_atm_b, p_0_3_um, p_0_3_um_b,
+              p_0_5_um, p_0_5_um_b, p_1_0_um, p_1_0_um_b, p_2_5_um, p_2_5_um_b,
+              p_5_0_um, p_5_0_um_b, p_10_0_um, p_10_0_um_b))
+
+    if (is_null(channel)) {
+      channel <- rlang::eval_tidy("pm2_5_cf_ave", data)
+    } else (channel <- rlang::eval_tidy(channel, data))
+
+    data <- data %>% dplyr::filter(!!sym(channel) > low_threshold) %>%
+    dplyr::filter(!!sym(channel) < high_threshold) %>%
+    dplyr::filter(!is.na(current_humidity) & !is.na(current_temp_f))
 }
