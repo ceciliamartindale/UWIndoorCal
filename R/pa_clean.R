@@ -1,0 +1,195 @@
+#' Read in PurpleAir files
+#'
+#' @param path the path to the PurpleAir data.
+#' @param timezoneval the timezone local to where the PurpleAir data was collected.
+#'     To get the list of all timezone names, use OlsonNames().
+#'
+#' @returns dataframe of PurpleAir observations
+#' @export
+#'
+#' @examples
+#' pa_data <- read_pa("Project/Data", "US/Pacific")
+read_pa <- function(path, timezoneval) {
+  pa.files <- list.files(path, recursive=T, full.names = T)
+  pa <- lapply(pa.files, data.table::fread) %>% data.table::rbindlist() %>%
+    dplyr::mutate(current_temp_f = as.numeric(current_temp_f),
+           current_humidity = as.numeric(current_humidity),
+           current_dewpoint_f = as.numeric(current_dewpoint_f),
+           pressure = as.numeric(pressure), adc = as.numeric(adc),
+           pm2_5_cf_1=as.numeric(pm2_5_cf_1),
+           pm10_0_cf_1=as.numeric(pm10_0_cf_1),
+           pm2_5_atm=as.numeric(pm2_5_atm),
+           pm10_0_atm=as.numeric(pm10_0_atm),
+           pm2.5_aqi_cf_1=as.numeric(pm2.5_aqi_cf_1),
+           pm2.5_aqi_atm=as.numeric(pm2.5_aqi_atm),
+           pm2_5_atm_b = as.numeric(pm2_5_atm_b),
+           pm1_0_cf_1 = as.numeric(pm1_0_cf_1), pm1_0_atm = as.numeric(pm1_0_atm),
+           p_0_3_um = as.numeric(p_0_3_um), p_0_5_um = as.numeric(p_0_5_um),
+           p_1_0_um = as.numeric(p_1_0_um), p_2_5_um = as.numeric(p_2_5_um),
+           p_5_0_um = as.numeric(p_5_0_um), p_10_0_um = as.numeric(p_10_0_um),
+           pm1_0_cf_1_b = as.numeric(pm1_0_cf_1_b),
+           pm2_5_cf_1_b = as.numeric(pm2_5_cf_1_b),
+           pm10_0_cf_1_b = as.numeric(pm10_0_cf_1_b),
+           pm1_0_atm_b = as.numeric(pm1_0_atm_b),
+           pm10_0_atm_b = as.numeric(pm10_0_atm_b),
+           pm2.5_aqi_cf_1_b = as.numeric(pm2.5_aqi_cf_1_b),
+           pm2.5_aqi_atm_b = as.numeric(pm2.5_aqi_atm_b),
+           p_0_3_um_b = as.numeric(p_0_3_um_b),
+           p_0_5_um_b = as.numeric(p_0_5_um_b),
+           p_1_0_um_b = as.numeric(p_1_0_um_b),
+           p_2_5_um_b = as.numeric(p_2_5_um_b),
+           p_5_0_um_b = as.numeric(p_5_0_um_b),
+           p_10_0_um_b = as.numeric(p_10_0_um_b),
+           gas=as.numeric(gas))
+  pa[, datetimeUTC := as.POSIXct(UTCDateTime,  tz = "GMT",
+                                 format="%Y/%m/%dT%H:%M:%Sz")]
+  pa[, datetime := as.POSIXct(format(datetimeUTC,  tz = timezoneval))]
+  pa
+}
+
+
+#' Get correlation of a and b channels by machine address
+#'
+#' @param data a dataframe of PurpleAir data, including the mac_address column
+#' @param channela channel A variable, default is pm2_5_cf_1.
+#' @param channelb channel B variable, default is pm2_5_cf_1_b.
+#' @param threshold a PM2.5 value to assess correlation under. Default is 100 ug/m^3.
+#' @param datetime datetime variable, default is datetime.
+#'
+#' @returns a printed dataframe of correlation between channels, maximum PM2.5,
+#'     median PM2.5, mean PM2.5, number of observations, and machine address
+#'     (mac_address).
+#' @export
+#'
+#' @examples
+#' pa_corr_ab(data, channela=pm2_5_atm, channelb=pm2_5_atm_b, threshold=500)
+#' pa_corr_ab(data, threshold=150, datetime=UTCDateTime)
+pa_corr_ab <- function(data, channela=NULL, channelb=NULL, threshold=NULL, datetime=NULL) {
+  if (is_null(channela)) {
+    channela <- rlang::eval_tidy("pm2_5_cf_1", data)
+    } else (channela <- rlang::eval_tidy(ensym(channela), data))
+  if (is_null(channelb)) {
+    channelb <- rlang::eval_tidy("pm2_5_cf_1_b", data)
+  } else (channelb <- rlang::eval_tidy(ensym(channelb), data))
+  if (is_null(threshold)) (threshold=100)
+  if (is_null(datetime)) (datetime="datetime")
+  print(channela)
+  print(channelb)
+
+  if (length(unique(pa_data$mac_address))==1) {
+    corrvals <- data %>% dplyr::filter(!is.na(!!sym(channela)) & !is.na(!!sym(channelb))) %>%
+      dplyr::filter(!!sym(channela) < threshold & !!sym(channelb) < threshold) %>%
+      dplyr::summarise(Correlation=stats::cor(!!sym(channela),!!sym(channelb)), max_a = max(!!sym(channela), na.rm=TRUE),
+                       max_b = max(!!sym(channelb), na.rm=TRUE), median_a = median(!!sym(channela), na.rm=TRUE),
+                       median_b = median(!!sym(channelb), na.rm=TRUE), mean_a = mean(!!sym(channela), na.rm=TRUE),
+                       mean_b = mean(!!sym(channelb), na.rm=TRUE), obs = length(datetime))
+  }
+  if (length(unique(pa_data$mac_address)) > 1) {
+    corrvals <- data %>% dplyr::filter(!is.na(!!sym(channela)) & !is.na(!!sym(channelb))) %>%
+      dplyr::filter(!!sym(channela) < threshold & !!sym(channelb) < threshold) %>%
+      dplyr::group_by(mac_address) %>%
+      dplyr::summarise(Correlation=stats::cor(!!sym(channela),!!sym(channelb)), max_a = max(!!sym(channela), na.rm=TRUE),
+                     max_b = max(!!sym(channelb), na.rm=TRUE), median_a = median(!!sym(channela), na.rm=TRUE),
+                     median_b = median(!!sym(channelb), na.rm=TRUE), mean_a = mean(!!sym(channela), na.rm=TRUE),
+                     mean_b = mean(!!sym(channelb), na.rm=TRUE), obs = length(datetime))
+  }
+
+  print(corrvals)
+}
+
+#' Plot correlation of A and B channels
+#'
+#' @param data dataframe containing PurpleAir data
+#' @param channela channel A variable, default is pm2_5_cf_1.
+#' @param channelb channel B variable, default is pm2_5_cf_1_b.
+#'
+#' @returns plot of correlation of A and B channels.
+#' @export
+#'
+#' @examples
+#' pa_corr_plot(pa_data)
+#'
+#' pa_corr_plot(pa_data, "pm2_5_atm", "pm2_5_atm_b")
+pa_corr_plot <- function(data, channela=NULL, channelb=NULL) {
+  if (is_null(channela)) {
+    channela <- rlang::eval_tidy("pm2_5_cf_1", data)
+    } else (channela <- rlang::eval_tidy(ensym(channela), data))
+  if (is_null(channelb)) {
+    channelb <- rlang::eval_tidy("pm2_5_cf_1_b", data)
+  } else (channelb <- rlang::eval_tidy(ensym(channelb), data))
+
+  # make it so that if it's a list it does multiple?
+
+  labx <- data %>% select(channela) %>% max(na.rm=T)/1.5
+  laby <- data %>% select(channela) %>% max(na.rm=T)/4
+
+  ggplot2::ggplot(data, ggplot2::aes(x=!!sym(channela), y=!!sym(channelb)))+
+  ggplot2::geom_point(pch=1)+ ggplot2:: ggtitle("PM2.5 Channel Agreement") +
+  ggplot2::geom_smooth(method="lm", color="black") +
+  ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
+  ggplot2::theme(plot.subtitle = ggplot2::element_text(hjust = 0.5, color="grey32")) +
+  ggplot2::xlab(as.character(channela)) + ggplot2::ylab(as.character(channelb)) +
+  ggpubr::stat_cor(ggplot2::aes(label=ggplot2::after_stat(rr.label)),
+                   label.x=labx, label.y=laby) +
+    ggplot2::facet_wrap(~mac_address)
+}
+
+#' Plot time series of A and B channels
+#'
+#' @param data dataframe containing PurpleAir data
+#' @param timescale time period string to show on the x-axis.
+#' @param channela channel A variable, default is pm2_5_cf_1.
+#' @param channelb channel B variable, default is pm2_5_cf_1_b.
+#'
+#' @returns timeseries plots of channel A and channel B on the same plot
+#' @export
+#'
+#' @examples
+#' pa_timeseries(pa_data, "1 month")
+#' pa_timeseries(pa_data, "3 weeks")
+pa_timeseries <- function(data, timescale, channela=NULL, channelb=NULL) {
+  if (is_null(channela)) {
+    channela <- rlang::eval_tidy("pm2_5_cf_1", data)
+  } else (channela <- rlang::eval_tidy(ensym(channela), data))
+  if (is_null(channelb)) {
+    channelb <- rlang::eval_tidy("pm2_5_cf_1_b", data)
+  } else (channelb <- rlang::eval_tidy(ensym(channelb), data))
+
+  ggplot2::ggplot() +
+    ggplot2::ggtitle("Time series inspection") +
+    ggplot2::geom_point(data= data,
+          mapping=ggplot2::aes(x=datetime, y=!!sym(channela), color = as.character(channela)),
+          pch=2, size =0.5, alpha=0.5) +
+    ggplot2::geom_point(data=data,
+          mapping=ggplot2::aes(x=datetime, y=!!sym(channelb), color = as.character(channelb)),
+               pch=1, size =0.5, alpha=0.5) +
+    ggplot2::xlab("Observation Month") + ggplot2::ylab("PM2.5 Concentration (ug/m3)") +
+    ggplot2::scale_x_datetime(date_breaks=timescale) +
+    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
+    ggplot2::theme(axis.title.y = ggplot2::element_text(vjust = 0.5)) +
+    ggplot2::facet_wrap(~mac_address)
+}
+## include averaging the count channels,
+#averaging the cf channels
+
+## could include a function to filter out obvious high points and filter out
+# < 2 data for calibration, make sure there is no NA humidity
+prep_pa_data <- function(data, channel, low_threshold=NULL, high_threshold=NULL, avgtime=NULL) {
+  if(is.na(low_threshold)) (low_threshold=2)
+  if(is.na(high_threshold)) (high_threshold=500)
+  if(is.na(avgtime)) (avgtime="60 min")
+  channelspa = colnames(data)[13:40]
+  # NEED TO CHECK IF THIS NEEDS TO CHANGE
+
+  data <- data %>% filter(channel > low_threshold) %>% filter(channel < high_threshold) %>%
+    filter(!is.na(current_humidity))
+  data <- data[,datetime5 := ceiling_date(datetime, avgtime)]
+  data <- data[ , mean_PMchannel := mean(channel, na.rm = T), by = datetime5]
+  data <- data[, lapply(.SD, mean, na.rm = TRUE),
+                                  by = c("mac_address", "datetime5"),
+                                  .SDcols = c("current_dewpoint_f",
+                                              "current_temp_f",
+                                              "current_humidity",
+                                              "pressure",
+                                              "mean_PMchannel", channelspa)]
+}

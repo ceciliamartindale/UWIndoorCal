@@ -1,0 +1,32 @@
+Package: lcscal
+Title: Calibrating Low-Cost Sensors Against Regulatory Monitors
+Version: 0.0.0.9000
+Authors@R: 
+    c(person("Cecilia", "Martindale", email="cm763@uw.edu", role = c("aut", "cre"),
+    comment = c(ORCID = "0009-0006-7983-8990")),
+    person("Elena", "Austin", email="elaustin@uw.edu", role = c("aut"),
+    comment = c(ORCID = "0000-0002-4724-1042")))
+Description: This package provides functions for cleaning and calibrating low-cost 
+    sensor data. It is tailored for two-channel PurpleAir sensors. Functions include
+    those for inspecting and cleaning PurpleAir data, partitioning data for regression
+    for calibration approach, creating multiple calibration models, and evaluating
+    models.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports: 
+    caret,
+    cli,
+    con2aqi,
+    data.table,
+    dplyr,
+    ggplot2,
+    ggpubr,
+    glue,
+    lifecycle,
+    magrittr,
+    plyr,
+    rlang,
+    stats,
+    withr
