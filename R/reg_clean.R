@@ -43,6 +43,9 @@ read_reg <- function(path, timezoneval, timeformat, time_var=NULL,
 
 }
 
+## Above: add an optional column for station name, add UTCdatetime column in the df
+## change regulatory timezone variable to make it more clear what we need, give example of the Etc/GMT+8
+
 #' Merge regulatory and PurpleAir data
 #'
 #' @param pa_data dataframe with cleaned PA data.

@@ -47,6 +47,7 @@ read_pa <- function(path, timezoneval) {
   pa
 }
 
+## TO ADD: error catching
 
 #' Get correlation of a and b channels by machine address
 #'
@@ -118,8 +119,6 @@ pa_corr_plot <- function(data, channela=NULL, channelb=NULL) {
     channelb <- rlang::eval_tidy("pm2_5_cf_1_b", data)
   } else (channelb <- rlang::eval_tidy(ensym(channelb), data))
 
-  # make it so that if it's a list it does multiple?
-
   labx <- data %>% select(channela) %>% max(na.rm=T)/1.5
   laby <- data %>% select(channela) %>% max(na.rm=T)/4
 
@@ -169,6 +168,8 @@ pa_timeseries <- function(data, timescale, channela=NULL, channelb=NULL) {
     ggplot2::theme(axis.title.y = ggplot2::element_text(vjust = 0.5)) +
     ggplot2::facet_wrap(~mac_address)
 }
+
+#TRY changing pch to "."
 
 #' Prepare PurpleAir data for calibration
 #'

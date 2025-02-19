@@ -53,5 +53,68 @@ partition <- function(data, proportion, initial_Window, seed_val) {
   train_and_test_data
 }
 
-# train models
+### Above: add a note saying that this assumes your data is complete. Pull from paper about
+## why this is important
+
+### Add an option to only include complete data, say in the function how many rows
+## were taken out.
+
+#' Helper function to train models. Can be used to train an individual model.
+#'
+#' @param formula Regression formula for use in calibration.
+#' @param train_data Training dataframe.
+#'
+#' @returns results of the model
+#' @export
+#'
+#' @examples
+#' train_test_data <- partition(cal_data, 0.7, 168, 5)
+#' train_data <- train_test_data$train
+#' individual_model <- train_model_helper(formula=NPH_PM25 ~ 0 + pm2_5_cf_ave +
+#'    current_humidity_outdoor +
+#'    I(current_humidity_outdoor^2)+
+#'    current_temp_f_outdoor +
+#'    as.factor(season), train_data)
+train_model_helper <- function(formula, train_data) {
+  caret::train(
+    formula,
+    data = train_data,
+    method = "lm",
+    metric = "RMSE",
+    tuneGrid = expand.grid(intercept = FALSE),
+    na.action = na.exclude
+  )
+}
+
+#' Train multiple models and compare results.
+#'
+#' @param formulas a named list of formulas.
+#' @param train_data training dataframe.
+#'
+#' @returns summaries of models being trained and resampled plot of RMSE.
+#' @export
+#'
+#' @examples
+#' train_test_data <- partition(cal_data, 0.7, 168, 5)
+#' train_data <- train_test_data$train
+#' formulas <- list(formula1 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
+#'    current_humidity_outdoor + I(current_humidity_outdoor^2) +
+#'    current_temp_f_outdoor + as.factor(season),
+#'                  formula2 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
+#'    current_humidity_outdoor + current_temp_f_outdoor + as.factor(season)
+#'                  formula3 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
+#'    current_temp_f_outdoor + as.factor(season)
+#'                  formula4 = NPH_PM25 ~ 0 + pm2_5_cf_ave + as.factor(season))
+#' train_models(formulas, train_data)
+train_models <- function(formulas, train_data) {
+  models <- purrr::map(formulas, train_model_helper)
+
+  purrr::map(models, summary)
+
+  resamps <- caret::resamples(models)
+
+  summary(resamps)
+  dotplot(resamps, metric = "RMSE")
+}
+
 # get results of trained models
