@@ -12,7 +12,8 @@ merge_reg_pa(pa_data, reg_data, add_season, time_var = NULL)
 \item{reg_data}{dataframe with cleaned regulatory data.}
 
 \item{add_season}{binary 0 or 1, if 1 will create a season variable based on
-the time.}
+the time. This will be an integer where 1 = winter, 2 = spring, 3 = summer,
+and 4 = fall.}
 
 \item{time_var}{name of time variable, if different from the default of datetimehr.}
 }

@@ -24,6 +24,7 @@ Imports:
     ggplot2,
     ggpubr,
     glue,
+    lattice,
     lifecycle,
     lubridate,
     magrittr,

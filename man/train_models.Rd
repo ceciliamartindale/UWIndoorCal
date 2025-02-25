@@ -21,12 +21,12 @@ Train multiple models and compare results.
 train_test_data <- partition(cal_data, 0.7, 168, 5)
 train_data <- train_test_data$train
 formulas <- list(formula1 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
-   current_humidity_outdoor + I(current_humidity_outdoor^2) +
-   current_temp_f_outdoor + as.factor(season),
+   current_humidity_outdoor + I(current_humidity^2) +
+   current_temp_f + as.factor(season),
                  formula2 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
-   current_humidity_outdoor + current_temp_f_outdoor + as.factor(season)
+   current_humidity + current_temp_f + as.factor(season),
                  formula3 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
-   current_temp_f_outdoor + as.factor(season)
+   current_temp_f + as.factor(season),
                  formula4 = NPH_PM25 ~ 0 + pm2_5_cf_ave + as.factor(season))
 train_models(formulas, train_data)
 }

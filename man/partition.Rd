@@ -26,5 +26,5 @@ Partition data for calibration using time-sliced approach
 }
 \examples{
 train_test <- partition(cal_data, 0.7, 336, 5)
-train_test_two_week_slice <- partition(cal_data, 0.7, 168, 5)
+train_test_one_week_slice <- partition(cal_data, 0.7, 168, 5)
 }

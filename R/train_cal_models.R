@@ -13,7 +13,7 @@
 #'
 #' @examples
 #' train_test <- partition(cal_data, 0.7, 336, 5)
-#' train_test_two_week_slice <- partition(cal_data, 0.7, 168, 5)
+#' train_test_one_week_slice <- partition(cal_data, 0.7, 168, 5)
 partition <- function(data, proportion, initial_Window, seed_val) {
   time_slices <- caret::createTimeSlices(1:nrow(data),
                                 initialWindow = initial_Window,
@@ -98,23 +98,23 @@ train_model_helper <- function(formula, train_data) {
 #' train_test_data <- partition(cal_data, 0.7, 168, 5)
 #' train_data <- train_test_data$train
 #' formulas <- list(formula1 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
-#'    current_humidity_outdoor + I(current_humidity_outdoor^2) +
-#'    current_temp_f_outdoor + as.factor(season),
+#'    current_humidity_outdoor + I(current_humidity^2) +
+#'    current_temp_f + as.factor(season),
 #'                  formula2 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
-#'    current_humidity_outdoor + current_temp_f_outdoor + as.factor(season)
+#'    current_humidity + current_temp_f + as.factor(season),
 #'                  formula3 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
-#'    current_temp_f_outdoor + as.factor(season)
+#'    current_temp_f + as.factor(season),
 #'                  formula4 = NPH_PM25 ~ 0 + pm2_5_cf_ave + as.factor(season))
 #' train_models(formulas, train_data)
 train_models <- function(formulas, train_data) {
-  models <- purrr::map(formulas, train_model_helper)
+  models <- purrr::map(formulas, \(f) train_model_helper(f, train_data))
 
   purrr::map(models, summary)
 
   resamps <- caret::resamples(models)
 
-  summary(resamps)
-  dotplot(resamps, metric = "RMSE")
+  print(summary(resamps))
+  lattice::dotplot(resamps, metric = "RMSE")
 }
 
 # get results of trained models
