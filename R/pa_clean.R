@@ -103,6 +103,7 @@ pa_corr_ab <- function(data, channela=NULL, channelb=NULL, threshold=NULL, datet
 #' @param data dataframe containing PurpleAir data.
 #' @param channela channel A variable, default is pm2_5_cf_1.
 #' @param channelb channel B variable, default is pm2_5_cf_1_b.
+#' @param threshold a PM2.5 value to assess correlation under. Default is 500 ug/m^3.
 #'
 #' @returns plot of correlation of A and B channels.
 #' @export
@@ -111,13 +112,17 @@ pa_corr_ab <- function(data, channela=NULL, channelb=NULL, threshold=NULL, datet
 #' pa_corr_plot(pa_data)
 #'
 #' pa_corr_plot(pa_data, "pm2_5_atm", "pm2_5_atm_b")
-pa_corr_plot <- function(data, channela=NULL, channelb=NULL) {
+pa_corr_plot <- function(data, channela=NULL, channelb=NULL, threshold=NULL) {
   if (is_null(channela)) {
     channela <- rlang::eval_tidy("pm2_5_cf_1", data)
     } else (channela <- rlang::eval_tidy(ensym(channela), data))
   if (is_null(channelb)) {
     channelb <- rlang::eval_tidy("pm2_5_cf_1_b", data)
   } else (channelb <- rlang::eval_tidy(ensym(channelb), data))
+
+  if (is_null(threshold)) {
+    data <- data %>% dplyr::filter(!!sym(channela) < 500 & !!sym(channelb) < 500)
+  } else (data <- data %>% dplyr::filter(!!sym(channela) < threshold & !!sym(channelb) < threshold))
 
   labx <- data %>% select(channela) %>% max(na.rm=T)/1.5
   laby <- data %>% select(channela) %>% max(na.rm=T)/4
@@ -158,18 +163,16 @@ pa_timeseries <- function(data, timescale, channela=NULL, channelb=NULL) {
     ggplot2::ggtitle("Time series inspection") +
     ggplot2::geom_point(data= data,
           mapping=ggplot2::aes(x=datetime, y=!!sym(channela), color = as.character(channela)),
-          pch=2, size =0.5, alpha=0.5) +
+          pch=".", size =1.5, alpha=0.5) +
     ggplot2::geom_point(data=data,
           mapping=ggplot2::aes(x=datetime, y=!!sym(channelb), color = as.character(channelb)),
-               pch=1, size =0.5, alpha=0.5) +
+               pch=".", size =1.5, alpha=0.5) +
     ggplot2::xlab("Observation Month") + ggplot2::ylab("PM2.5 Concentration (ug/m3)") +
     ggplot2::scale_x_datetime(date_breaks=timescale) +
     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
     ggplot2::theme(axis.title.y = ggplot2::element_text(vjust = 0.5)) +
     ggplot2::facet_wrap(~mac_address)
 }
-
-#TRY changing pch to "."
 
 #' Prepare PurpleAir data for calibration
 #'
@@ -189,16 +192,19 @@ pa_timeseries <- function(data, timescale, channela=NULL, channelb=NULL) {
 #'   an appropriate threshold value for cleaning.
 #' @param avgtime time period to average measurements over. The default is 60 minutes,
 #'  which provides hourly air quality measurements.
+#' @param station name of station to calibrate off of.
 #'
-#' @returns a dataframe of PurpleAir data ready for calibration. Data should still
-#'  be thoroughly expected for agreement between a and b channels and obvious dysfunction.
+#' @returns a dataframe of PurpleAir data ready for calibration, averaged by avgtime
+#'  (default is one hour). Data should be thoroughly expected for agreement between
+#'  a and b channels and obvious dysfunction before this function.
 #' @export
 #'
 #' @examples
 #' pa_data_cal <- prep_pa_data(pa_data)
 #' pa_data_cal <- prep_pa_data(pa_data, channel="pm2.5_aqi_cf_ave", low_threshold=0,
 #'  high_threshold=300)
-prep_pa_data <- function(data, channel=NULL, low_threshold=NULL, high_threshold=NULL, avgtime=NULL) {
+prep_pa_data <- function(data, channel=NULL, low_threshold=NULL, high_threshold=NULL, avgtime=NULL,
+                         station=NULL) {
   if(is_null(low_threshold)) (low_threshold=2)
   if(is_null(high_threshold)) (high_threshold=500)
   if(is_null(avgtime)) (avgtime="60 min")
@@ -229,9 +235,9 @@ prep_pa_data <- function(data, channel=NULL, low_threshold=NULL, high_threshold=
                                  p_2_5_um_ave = (p_2_5_um+p_2_5_um_b)/2,
                                  p_5_0_um_ave = (p_5_0_um+p_5_0_um_b)/2,
                                  p_10_0_um_ave = (p_10_0_um+p_10_0_um_b)/2) %>%
-    select(-c(pm2_5_cf_1, pm2_5_cf_1_b, pm10_0_cf_1, pm10_0_cf_1_b,
-              pm2_5_atm, pm2_5_atm_b, pm10_0_atm, pm10_0_atm_b, pm2.5_aqi_cf_1,
-              pm2.5_aqi_cf_1_b, pm2.5_aqi_atm, pm2.5_aqi_atm_b, pm1_0_cf_1,
+    select(-c(pm10_0_cf_1, pm10_0_cf_1_b,
+              pm10_0_atm, pm10_0_atm_b, pm2.5_aqi_atm,
+              pm2.5_aqi_atm_b, pm1_0_cf_1,
               pm1_0_cf_1_b, pm1_0_atm, pm1_0_atm_b, p_0_3_um, p_0_3_um_b,
               p_0_5_um, p_0_5_um_b, p_1_0_um, p_1_0_um_b, p_2_5_um, p_2_5_um_b,
               p_5_0_um, p_5_0_um_b, p_10_0_um, p_10_0_um_b))
@@ -243,4 +249,8 @@ prep_pa_data <- function(data, channel=NULL, low_threshold=NULL, high_threshold=
     data <- data %>% dplyr::filter(!!sym(channel) > low_threshold) %>%
     dplyr::filter(!!sym(channel) < high_threshold) %>%
     dplyr::filter(!is.na(current_humidity) & !is.na(current_temp_f))
+
+    if (!is_null(station)) {
+      data <- data %>% mutate(station=station)
+    }
 }

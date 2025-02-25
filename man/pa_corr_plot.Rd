@@ -4,7 +4,7 @@
 \alias{pa_corr_plot}
 \title{Plot correlation of A and B channels}
 \usage{
-pa_corr_plot(data, channela = NULL, channelb = NULL)
+pa_corr_plot(data, channela = NULL, channelb = NULL, threshold = NULL)
 }
 \arguments{
 \item{data}{dataframe containing PurpleAir data.}
@@ -12,6 +12,8 @@ pa_corr_plot(data, channela = NULL, channelb = NULL)
 \item{channela}{channel A variable, default is pm2_5_cf_1.}
 
 \item{channelb}{channel B variable, default is pm2_5_cf_1_b.}
+
+\item{threshold}{a PM2.5 value to assess correlation under. Default is 500 ug/m^3.}
 }
 \value{
 plot of correlation of A and B channels.

@@ -7,9 +7,11 @@
 read_reg(
   path,
   timezoneval,
+  timezone_etc,
   timeformat,
-  time_var = NULL,
-  PM25_var = NULL,
+  time_ind,
+  PM25_ind,
+  skip = NULL,
   avgtime = NULL,
   low_threshold = NULL
 )
@@ -22,11 +24,17 @@ before loading in a list.}
 \item{timezoneval}{the timezone local to where the regulatory data was collected.
 To get the list of all timezone names, use OlsonNames().}
 
+\item{timezone_etc}{the timezone local to where the regulatory data was collected
+in "Etc/GMT+8" format (the format that does not observe daylight savings time),
+as regulatory monitors generally do not observe daylight savings time.}
+
 \item{timeformat}{time format of the regulatory data (see ?strptime() for options).}
 
-\item{time_var}{string name of time variable in regulatory csv file.}
+\item{time_ind}{column index of time variable in regulatory csv file.}
 
-\item{PM25_var}{string name of PM2.5 variable in regulatory csv file.}
+\item{PM25_ind}{column index of PM2.5 variable in regulatory csv file.}
+
+\item{skip}{number of rows of original file to skip (see fread documentation for more).}
 
 \item{avgtime}{time interval to average measurements over. The default is 60 minutes.}
 
@@ -34,12 +42,13 @@ To get the list of all timezone names, use OlsonNames().}
 is the limit of the detection for many nephelometers.}
 }
 \value{
-a dataframe of regulatory data ready for use in calibration.
+a dataframe of regulatory data ready for use in calibration with station
+names, UTC time, and local time.
 }
 \description{
 Read in regulatory data, filter low values, set datetime interval
 }
 \examples{
 reg_data <- read_reg("DATA/REG", "US/Pacific", "\%m/\%d/\%Y \%I:\%M:\%S \%p",
-  skip=8, time_var=`Observation Time`, PM25_var=`Tukwila Allentown - Pm25Neph - ug/m3 - 1Hr Avg`)
+  time_ind=1, PM25_ind=2,skip=8)
 }

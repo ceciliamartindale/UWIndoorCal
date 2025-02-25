@@ -9,7 +9,8 @@ prep_pa_data(
   channel = NULL,
   low_threshold = NULL,
   high_threshold = NULL,
-  avgtime = NULL
+  avgtime = NULL,
+  station = NULL
 )
 }
 \arguments{
@@ -33,10 +34,13 @@ an appropriate threshold value for cleaning.}
 
 \item{avgtime}{time period to average measurements over. The default is 60 minutes,
 which provides hourly air quality measurements.}
+
+\item{station}{name of station to calibrate off of.}
 }
 \value{
-a dataframe of PurpleAir data ready for calibration. Data should still
-be thoroughly expected for agreement between a and b channels and obvious dysfunction.
+a dataframe of PurpleAir data ready for calibration, averaged by avgtime
+(default is one hour). Data should be thoroughly expected for agreement between
+a and b channels and obvious dysfunction before this function.
 }
 \description{
 Prepare PurpleAir data for calibration
