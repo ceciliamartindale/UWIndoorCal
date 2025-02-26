@@ -109,7 +109,7 @@ train_model_helper <- function(formula, train_data) {
 train_models <- function(formulas, train_data) {
   models <- purrr::map(formulas, \(f) train_model_helper(f, train_data))
 
-  purrr::map(models, summary)
+  purrr::walk(models, ~ print(summary(.x)))
 
   resamps <- caret::resamples(models)
 
