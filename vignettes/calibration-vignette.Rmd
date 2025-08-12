@@ -1,0 +1,103 @@
+---
+title: "Calibration vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Calibration vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(lcscal)
+library(here)
+library(dplyr)
+```
+
+# Intro
+
+This vignette takes you through a workflow for calibrating low-cost sensors for indoor air quality. We will be using PurpleAir Zen sensors, which have two different channels (channels a and b).
+
+# Data setup & considerations
+
+In order to calibrate PurpleAir data using this package, you will need outdoor PurpleAir sensor data and regulatory monitor data for the same time period. We suggest having separate folders for each of these data sets. The functions assume that the files are csv files, so if you are storing them as .zip files you will need to unzip them before running the read_pa and read_reg functions. 
+
+Before starting to calibrate, you need to know what time zone your monitoring data is in when collected. PurpleAir monitors record in UTC, and they generally observe Daylight Savings Time. Regulatory monitors often record in local time but WITHOUT observing Daylight Savings Time. These times need to be reconciled, and the read_pa and read_reg functions have parameters for time zones. However, you need to check and make sure you have the correct input time zones to prevent incorrect data merges.
+
+# Reading in data
+
+## PurpleAir data
+
+To read in the data, we will use the read_pa function to read raw PurpleAir files. For this vignette, we will read in data for a 3-month period across two different sensors. This data is in the form of daily csv files downloaded from microSD cards from the PurpleAir monitors. 
+
+The read_pa function is designed to read many PurpleAir files at once. It is useful to examine one file separately to get an idea of the data structure. This function has just two parameters: the path to the PurpleAir data and the target time zone. 
+
+```{r read-pa-data}
+pa_path <- here("DATA/StP_testing_PA")
+pa_data <- read_pa(here("DATA/StP_testing_PA/Outdoor"), "US/Pacific")
+
+# Examine data to see what variables there are and what format those variables are in.
+glimpse(pa_data)
+```
+
+After glimpsing this data, we see all of the PurpleAir variables, a datetimeUTC column, and a datetime column that is in our target time zone.
+
+## Regulatory data
+
+For this example, we use data obtained from the Puget Sound Clean Air Agency Air Graphing Tool (https://secure.pscleanair.org/airgraphing). To read in the regulatory data, we will use the function read_reg, which has the parameters of path, timezoneval (target timezone), timezone_etc (target timezone that does not observe Daylight Savings Time), timeformat (the striptime format of the raw time variable), time_ind (column index of the raw time variable), and PM25_ind (column index of the PM2.5 variable). There are also three optional variables of skip (number of rows to skip), avgtime (time interval to average observations over), and low_threshold (a threshold to filter data above). 
+
+It is very important to look at the file before reading in the regulatory data, so that you know what you need to input as parameters.
+
+```{r read-reg-data}
+reg_path <- here("DATA/StP_testing_REG")
+reg_data <- read_reg(here("DATA/StP_testing_REG"), timezoneval = "US/Pacific",
+                     "Etc/GMT+8","%m/%d/%Y %I:%M:%S %p", time_ind=1, 
+                     PM25_ind = 2, skip =8, low_threshold = 2)
+
+glimpse(reg_data)
+```
+
+Next, we'll inspect and clean the PurpleAir data. pa_corr_plot plots the correlation between two a and b channels, 
+
+```{r clean-pa-data}
+pa_corr_plot(pa_data)
+
+pa_timeseries(pa_data, "1 month")
+# can see a period of really high PM2.5... could it be real? It's beginning of October 20223, I think I'm going to clean above 200
+# get the legend to render beneath it
+
+pa_data <- prep_pa_data(pa_data, low_threshold=0, high_threshold = 200, station = "Tukwila")
+```
+
+```{r merge-data}
+cal_data <- merge_reg_pa(pa_data, reg_data, add_season=1)
+```
+
+```{r train-models}
+train_test <- partition(cal_data, 0.7, 168, 5)
+
+train_data <- train_test$train
+
+formulas <- list(formula1 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
+    current_humidity + I(current_humidity^2) +
+    current_temp_f + as.factor(season),
+                  formula2 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
+    current_humidity + current_temp_f + as.factor(season),
+                  formula3 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
+    current_temp_f + as.factor(season),
+                  formula4 = NPH_PM25 ~ 0 + pm2_5_cf_ave + as.factor(season))
+
+train_models(formulas, train_data)
+```
+
+```{r model-CV}
+cv_data <- do_CV_mult(train_data, "train_index", "select_index", formulas)
+
+plot_CV_corr(cv_data, "NPH_PM25", "cvpreds_model_3", "Model 3")
+```

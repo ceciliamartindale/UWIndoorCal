@@ -2,7 +2,7 @@
 % Please edit documentation in R/model_cv.R
 \name{get_MSE}
 \alias{get_MSE}
-\title{Get mean-squared error (MSE) (Author: Magali Blanco)}
+\title{Get mean-squared error (MSE)}
 \usage{
 get_MSE(obs, pred, AIC_var)
 }
@@ -17,7 +17,7 @@ get_MSE(obs, pred, AIC_var)
 dataframe of RMSE, MSE-based R^2, and AIC.
 }
 \description{
-Get mean-squared error (MSE) (Author: Magali Blanco)
+Get mean-squared error (MSE)
 }
 \examples{
 one_MSE <- get_MSE(train_data_CV$NPH_PM25, train_data_CV$cvpreds_model1, train_data_CV$AIC_model1)

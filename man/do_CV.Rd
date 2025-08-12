@@ -2,9 +2,9 @@
 % Please edit documentation in R/model_cv.R
 \name{do_CV}
 \alias{do_CV}
-\title{Do cross-validation (author: Magali Blanco)}
+\title{Do cross-validation}
 \usage{
-do_CV(data, id = "id", group = "group", formula)
+do_CV(data, id, group, formula)
 }
 \arguments{
 \item{data}{dataframe containing the training data.}
@@ -20,7 +20,7 @@ dataset with a new variable called cvpreds appended to the end;
 these are the out-of-sample predictions
 }
 \description{
-Do cross-validation (author: Magali Blanco)
+Do cross-validation
 }
 \examples{
 formula <- NPH_PM25 ~ 0 + p_0_3_um_ave + p_0_5_um_ave + p_1_0_um_ave +

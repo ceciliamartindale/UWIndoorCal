@@ -32,3 +32,7 @@ Imports:
     rlang,
     stats,
     withr
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

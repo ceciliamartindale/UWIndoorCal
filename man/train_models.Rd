@@ -4,7 +4,7 @@
 \alias{train_models}
 \title{Train multiple models and compare results.}
 \usage{
-train_models(formulas, data = train_data)
+train_models(formulas, train_data)
 }
 \arguments{
 \item{formulas}{a named list of formulas.}

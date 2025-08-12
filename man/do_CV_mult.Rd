@@ -4,7 +4,7 @@
 \alias{do_CV_mult}
 \title{Do cross-validation with multiple formulas.}
 \usage{
-do_CV_mult(data, id = "id", group = "group", formulas)
+do_CV_mult(data, id, group, formulas)
 }
 \arguments{
 \item{data}{dataframe containing the training data.}

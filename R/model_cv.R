@@ -1,4 +1,4 @@
-#' Do cross-validation (author: Magali Blanco)
+#' Do cross-validation
 #'
 #' @param data dataframe containing the training data.
 #' @param id unique variable for determining sort order of data frame
@@ -13,7 +13,7 @@
 #' formula <- NPH_PM25 ~ 0 + p_0_3_um_ave + p_0_5_um_ave + p_1_0_um_ave +
 #'     p_2_5_um_ave + current_temp_f
 #' do_CV(train_data, id = "train_index", group = "select_index", formula)
-do_CV <- function(data, id = "id", group = "group", formula) {
+do_CV <- function(data, id, group, formula) {
 
   # do for each cluster in the  dataset
   # (Note the use of "[[ ]]" rather than "$" because group is input in the
@@ -55,7 +55,7 @@ do_CV <- function(data, id = "id", group = "group", formula) {
 #'    current_temp_f + as.factor(season),
 #'                  formula4 = NPH_PM25 ~ 0 + pm2_5_cf_ave + as.factor(season))
 #' cv_data <- do_CV_mult(train_data, "train_index", "select_index", formulas)
-do_CV_mult <- function(data, id = "id", group = "group", formulas) {
+do_CV_mult <- function(data, id, group, formulas) {
   purrr::reduce(seq_along(formulas), function(data, model_num) {
     data %>%
       do_CV(id, group, formulas[model_num]) %>%
@@ -67,7 +67,7 @@ do_CV_mult <- function(data, id = "id", group = "group", formulas) {
 
 # get_MSE
 
-#' Get mean-squared error (MSE) (Author: Magali Blanco)
+#' Get mean-squared error (MSE)
 #'
 #' @param obs outcome variable
 #' @param pred prediction variable from a model
@@ -116,7 +116,7 @@ get_MSE <- function(obs,pred, AIC_var) {
 #'
 #' @examples
 #' plot_CV_corr(cv_merged, NPH_PM25, cvpreds_model_3, "Model 3")
-plot_CV_corr <- function(data=cv_data, obs="obs", pred="pred", model_name="name") {
+plot_CV_corr <- function(cv_data, obs, pred, model_name) {
   # get range for plot
   r <- cv_data %>% dplyr::select(obs, pred) %>% range()
   print(r)
