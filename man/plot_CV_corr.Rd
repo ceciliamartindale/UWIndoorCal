@@ -4,16 +4,16 @@
 \alias{plot_CV_corr}
 \title{Plot the correlation of the observed PM2.5 versus the predicted calibration.}
 \usage{
-plot_CV_corr(cv_data, obs = "obs", pred = "pred", model_name = "name")
+plot_CV_corr(data = cv_data, obs = "obs", pred = "pred", model_name = "name")
 }
 \arguments{
-\item{cv_data}{dataframe containing the cross-validated predictions.}
-
 \item{obs}{name of variable containing the observed PM2.5}
 
 \item{pred}{name of variable containing the predicted PM2.5}
 
 \item{model_name}{name of model for title}
+
+\item{cv_data}{dataframe containing the cross-validated predictions.}
 }
 \value{
 plot observed vs. predicted PM2.5

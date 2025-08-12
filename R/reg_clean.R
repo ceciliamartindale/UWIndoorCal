@@ -54,8 +54,8 @@ read_reg <- function(path, timezoneval, timezone_etc, timeformat, time_ind,
 
 #' Merge regulatory and PurpleAir data
 #'
-#' @param pa_data dataframe with cleaned PA data.
-#' @param reg_data dataframe with cleaned regulatory data.
+#' @param data_1 dataframe with cleaned PA data.
+#' @param data_2 dataframe with cleaned regulatory data.
 #' @param add_season binary 0 or 1, if 1 will create a season variable based on
 #'    the time. This will be an integer where 1 = winter, 2 = spring, 3 = summer,
 #'    and 4 = fall.
@@ -66,15 +66,15 @@ read_reg <- function(path, timezoneval, timezone_etc, timeformat, time_ind,
 #'
 #' @examples
 #' cal_data <- merge_reg_pa(pa_data, reg_data, add_season=1)
-merge_reg_pa <- function(pa_data, reg_data, add_season, time_var=NULL) {
+merge_reg_pa <- function(data_1=pa_data, data_2=reg_data, add_season, time_var=NULL) {
   if(!is_null(time_var)) {
-    data <- data %>% dplyr::rename(datetimehr=time_var)
+    data_1 <- data_1 %>% dplyr::rename(datetimehr=time_var)
   }
 
-  data.table::setkey(pa_data, datetimehr)
-  data.table::setkey(reg_data, datetimehr)
+  data.table::setkey(data_1, datetimehr)
+  data.table::setkey(data_2, datetimehr)
 
-  data <- reg_data[pa_data, on = c("station", "datetimehr")]
+  data <- data_2[data_1, on = c("station", "datetimehr")]
 
   if(add_season==1) {
     data <- data %>% dplyr::mutate(season=data.table::quarter(datetimehr))}

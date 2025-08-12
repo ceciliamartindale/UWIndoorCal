@@ -254,3 +254,6 @@ prep_pa_data <- function(data, channel=NULL, low_threshold=NULL, high_threshold=
       data <- data %>% mutate(station=station)
     }
 }
+
+## Could consider adding an argument to modify the variables that are selected out
+# not urgent but could be a compromise of not deciding

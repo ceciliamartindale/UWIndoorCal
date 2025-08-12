@@ -4,7 +4,7 @@
 \alias{train_model_helper}
 \title{Helper function to train models. Can be used to train an individual model.}
 \usage{
-train_model_helper(formula, train_data)
+train_model_helper(formula, data = train_data)
 }
 \arguments{
 \item{formula}{Regression formula for use in calibration.}

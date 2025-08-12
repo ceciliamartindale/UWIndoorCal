@@ -4,12 +4,12 @@
 \alias{merge_reg_pa}
 \title{Merge regulatory and PurpleAir data}
 \usage{
-merge_reg_pa(pa_data, reg_data, add_season, time_var = NULL)
+merge_reg_pa(data_1 = pa_data, data_2 = reg_data, add_season, time_var = NULL)
 }
 \arguments{
-\item{pa_data}{dataframe with cleaned PA data.}
+\item{data_1}{dataframe with cleaned PA data.}
 
-\item{reg_data}{dataframe with cleaned regulatory data.}
+\item{data_2}{dataframe with cleaned regulatory data.}
 
 \item{add_season}{binary 0 or 1, if 1 will create a season variable based on
 the time. This will be an integer where 1 = winter, 2 = spring, 3 = summer,
