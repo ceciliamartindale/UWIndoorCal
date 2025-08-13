@@ -7,9 +7,9 @@
 train_models(formulas, train_data)
 }
 \arguments{
-\item{formulas}{a named list of formulas.}
+\item{formulas}{a named list of formulas. ADD MORE FROM PAPER}
 
-\item{train_data}{training dataframe.}
+\item{train_data}{training dataframe. ADD MORE FROM PAPER}
 }
 \value{
 summaries of models being trained and resampled plot of RMSE.

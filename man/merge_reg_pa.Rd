@@ -2,26 +2,27 @@
 % Please edit documentation in R/reg_clean.R
 \name{merge_reg_pa}
 \alias{merge_reg_pa}
-\title{Merge regulatory and PurpleAir data}
+\title{Merge reference and PurpleAir data}
 \usage{
-merge_reg_pa(data_1 = pa_data, data_2 = reg_data, add_season, time_var = NULL)
+merge_reg_pa(data_1, data_2, add_season, time_var = NULL)
 }
 \arguments{
 \item{data_1}{dataframe with cleaned PA data.}
 
-\item{data_2}{dataframe with cleaned regulatory data.}
+\item{data_2}{dataframe with cleaned reference data.}
 
 \item{add_season}{binary 0 or 1, if 1 will create a season variable based on
-the time. This will be an integer where 1 = winter, 2 = spring, 3 = summer,
-and 4 = fall.}
+the calendar year. This will be an integer where 1 = winter, 2 = spring, 3 = summer,
+and 4 = fall. If data already has a season variable, set this to 0 so it is not
+overwritten.}
 
 \item{time_var}{name of time variable, if different from the default of datetimehr.}
 }
 \value{
-a dataframe of merged regulatory and PurpleAir data ready for calibration.
+a dataframe of merged reference and PurpleAir data ready for calibration.
 }
 \description{
-Merge regulatory and PurpleAir data
+Merge reference and PurpleAir data
 }
 \examples{
 cal_data <- merge_reg_pa(pa_data, reg_data, add_season=1)

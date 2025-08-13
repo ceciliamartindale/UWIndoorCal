@@ -2,7 +2,11 @@
 % Please edit documentation in R/train_cal_models.R
 \name{train_model_helper}
 \alias{train_model_helper}
-\title{Helper function to train models. Can be used to train an individual model.}
+\title{ADD reference to this one above once we have a reference. Also add more from the paper.
+\subsection{Above: add a note saying that this assumes your data is complete. Pull from paper about}{
+
+Helper function to train models. Can be used to train an individual model.
+}}
 \usage{
 train_model_helper(formula, train_data)
 }
@@ -15,7 +19,11 @@ train_model_helper(formula, train_data)
 results of the model
 }
 \description{
+ADD reference to this one above once we have a reference. Also add more from the paper.
+\subsection{Above: add a note saying that this assumes your data is complete. Pull from paper about}{
+
 Helper function to train models. Can be used to train an individual model.
+}
 }
 \examples{
 train_test_data <- partition(cal_data, 0.7, 168, 5)

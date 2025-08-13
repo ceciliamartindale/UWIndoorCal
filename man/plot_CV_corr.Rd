@@ -2,24 +2,24 @@
 % Please edit documentation in R/model_cv.R
 \name{plot_CV_corr}
 \alias{plot_CV_corr}
-\title{Plot the correlation of the observed PM2.5 versus the predicted calibration.}
+\title{Plot the correlation of the reference PM2.5 versus the predicted calibration.}
 \usage{
 plot_CV_corr(cv_data, obs, pred, model_name)
 }
 \arguments{
 \item{cv_data}{dataframe containing the cross-validated predictions.}
 
-\item{obs}{name of variable containing the observed PM2.5}
+\item{obs}{name of variable containing the reference PM2.5}
 
 \item{pred}{name of variable containing the predicted PM2.5}
 
 \item{model_name}{name of model for title}
 }
 \value{
-plot observed vs. predicted PM2.5
+plot reference vs. predicted PM2.5
 }
 \description{
-Plot the correlation of the observed PM2.5 versus the predicted calibration.
+Plot the correlation of the reference PM2.5 versus the predicted calibration.
 }
 \examples{
 plot_CV_corr(cv_merged, NPH_PM25, cvpreds_model_3, "Model 3")

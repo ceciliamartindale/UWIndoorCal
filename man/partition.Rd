@@ -8,10 +8,11 @@ partition(data, proportion, initial_Window, seed_val)
 }
 \arguments{
 \item{data}{air quality data for calibration. Should include channels of
-interest for calibration and regulatory reference values for matching time
+interest for calibration and reference values for matching time
 period.}
 
-\item{proportion}{proportion of data to be used in the training dataset (example: 0.7).}
+\item{proportion}{proportion of data to be used in the training dataset. We
+recommend 0.7 (70\%).}
 
 \item{initial_Window}{initial number of observations to be included in a timeslice.
 If using hourly data, 168 is one week of hourly observations.}

@@ -13,7 +13,7 @@ do_CV_mult(data, id, group, formulas)
 
 \item{group}{grouping variable (a variable in the data frame)}
 
-\item{formulas}{list of formulas to pass to lm}
+\item{formulas}{list of formulas to pass to linear models.}
 }
 \value{
 dataframe with CV_preds and AIC columns for each variable

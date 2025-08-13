@@ -7,8 +7,20 @@
 calibrate_PA_data(data, model)
 }
 \arguments{
-\item{model}{}
+\item{data}{\itemize{
+\item to add description
+}}
+
+\item{model}{\itemize{
+\item to add description
+}}
+}
+\value{
+calibrated PA data
 }
 \description{
 Calibrate PA data based on regression model
+}
+\examples{
+to add
 }

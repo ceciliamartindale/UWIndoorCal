@@ -6,7 +6,7 @@
 \usage{
 prep_pa_data(
   data,
-  channel = NULL,
+  channel = "pm2_5_cf_ave",
   low_threshold = NULL,
   high_threshold = NULL,
   avgtime = NULL,
@@ -22,20 +22,24 @@ to the end, but the default PurpleAir export should not have changed.}
 the averaged cf PM2.5 channel. We recommend using an averaged column such
 as pm2_5_atm_ave, pm2_5_cf_ave, or pm2.5_aqi_cf_ave.}
 
-\item{low_threshold}{Lower threshold to filter out. Default is 2 ug/m^3 because
-this is the limit of detection for (QUESTION: regulatory or PA??) monitors.
+\item{low_threshold}{Lower threshold to filter out. Default is 2 ug/m^3.
 We recommend inspecting your data well to determine an appropriate threshold
 value for cleaning.}
 
-\item{high_threshold}{Higher threshold to filter out. Default is 500
-because it is uncommon to have legitimate values above 500 ug/m^3 outside of
-periods of high smoke. We recommend inspecting your data well to determine
+\item{high_threshold}{Higher threshold to filter out. Default is 500 ug/m^3.
+Note that this should be carefully assessed, especially in periods of high smoke.
+We recommend inspecting your data well to determine
 an appropriate threshold value for cleaning.}
 
 \item{avgtime}{time period to average measurements over. The default is 60 minutes,
-which provides hourly air quality measurements.}
+which provides hourly air quality measurements. We use the "ceiling time",
+which would mean that for an hourly average at 1PM, we average the measurements
+collected between 12:01PM and 1PM.}
 
-\item{station}{name of station to calibrate off of.}
+\item{station}{name of station to calibrate off of, based on the reference
+data you provide. This will create a variable with the reference station name,
+which is important if calibrating different sensors using different reference
+stations.}
 }
 \value{
 a dataframe of PurpleAir data ready for calibration, averaged by avgtime

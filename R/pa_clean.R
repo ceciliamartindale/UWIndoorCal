@@ -41,8 +41,10 @@ read_pa <- function(path, timezoneval) {
            p_5_0_um_b = as.numeric(p_5_0_um_b),
            p_10_0_um_b = as.numeric(p_10_0_um_b),
            gas=as.numeric(gas))
+  # creating UTC datetime
   pa[, datetimeUTC := as.POSIXct(UTCDateTime,  tz = "GMT",
                                  format="%Y/%m/%dT%H:%M:%Sz")]
+  # creating datetime in local time zone, set using the timezoneval variable
   pa[, datetime := as.POSIXct(format(datetimeUTC,  tz = timezoneval))]
   pa
 }
@@ -182,17 +184,21 @@ pa_timeseries <- function(data, timescale, channela=NULL, channelb=NULL) {
 #' @param channel Channel to filter data based on. The default is pm2_5_cf_ave,
 #'   the averaged cf PM2.5 channel. We recommend using an averaged column such
 #'   as pm2_5_atm_ave, pm2_5_cf_ave, or pm2.5_aqi_cf_ave.
-#' @param low_threshold Lower threshold to filter out. Default is 2 ug/m^3 because
-#'   this is the limit of detection for (QUESTION: regulatory or PA??) monitors.
+#' @param low_threshold Lower threshold to filter out. Default is 2 ug/m^3.
 #'   We recommend inspecting your data well to determine an appropriate threshold
 #'   value for cleaning.
-#' @param high_threshold Higher threshold to filter out. Default is 500
-#'   because it is uncommon to have legitimate values above 500 ug/m^3 outside of
-#'   periods of high smoke. We recommend inspecting your data well to determine
+#' @param high_threshold Higher threshold to filter out. Default is 500 ug/m^3.
+#'   Note that this should be carefully assessed, especially in periods of high smoke.
+#'   We recommend inspecting your data well to determine
 #'   an appropriate threshold value for cleaning.
 #' @param avgtime time period to average measurements over. The default is 60 minutes,
-#'  which provides hourly air quality measurements.
-#' @param station name of station to calibrate off of.
+#'  which provides hourly air quality measurements. We use the "ceiling time",
+#'  which would mean that for an hourly average at 1PM, we average the measurements
+#'  collected between 12:01PM and 1PM.
+#' @param station name of station to calibrate off of, based on the reference
+#' data you provide. This will create a variable with the reference station name,
+#' which is important if calibrating different sensors using different reference
+#' stations.
 #'
 #' @returns a dataframe of PurpleAir data ready for calibration, averaged by avgtime
 #'  (default is one hour). Data should be thoroughly expected for agreement between
@@ -203,7 +209,7 @@ pa_timeseries <- function(data, timescale, channela=NULL, channelb=NULL) {
 #' pa_data_cal <- prep_pa_data(pa_data)
 #' pa_data_cal <- prep_pa_data(pa_data, channel="pm2.5_aqi_cf_ave", low_threshold=0,
 #'  high_threshold=300)
-prep_pa_data <- function(data, channel=NULL, low_threshold=NULL, high_threshold=NULL, avgtime=NULL,
+prep_pa_data <- function(data, channel="pm2_5_cf_ave", low_threshold=NULL, high_threshold=NULL, avgtime=NULL,
                          station=NULL) {
   if(is_null(low_threshold)) (low_threshold=2)
   if(is_null(high_threshold)) (high_threshold=500)
@@ -256,4 +262,4 @@ prep_pa_data <- function(data, channel=NULL, low_threshold=NULL, high_threshold=
 }
 
 ## Could consider adding an argument to modify the variables that are selected out
-# not urgent but could be a compromise of not deciding
+# not urgent but could be a compromise of not deciding - add this list

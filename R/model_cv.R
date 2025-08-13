@@ -1,4 +1,4 @@
-#' Do cross-validation
+#' Do cross-validation ADD language from paper
 #'
 #' @param data dataframe containing the training data.
 #' @param id unique variable for determining sort order of data frame
@@ -40,7 +40,7 @@ do_CV <- function(data, id, group, formula) {
 #' @param data dataframe containing the training data.
 #' @param id unique variable for determining sort order of data frame
 #' @param group grouping variable (a variable in the data frame)
-#' @param formulas list of formulas to pass to lm
+#' @param formulas list of formulas to pass to linear models.
 #'
 #' @returns dataframe with CV_preds and AIC columns for each variable
 #' @export
@@ -104,14 +104,14 @@ get_MSE <- function(obs,pred, AIC_var) {
   return(result)
 }
 
-#' Plot the correlation of the observed PM2.5 versus the predicted calibration.
+#' Plot the correlation of the reference PM2.5 versus the predicted calibration.
 #'
 #' @param cv_data dataframe containing the cross-validated predictions.
-#' @param obs name of variable containing the observed PM2.5
+#' @param obs name of variable containing the reference PM2.5
 #' @param pred name of variable containing the predicted PM2.5
 #' @param model_name name of model for title
 #'
-#' @returns plot observed vs. predicted PM2.5
+#' @returns plot reference vs. predicted PM2.5
 #' @export
 #'
 #' @examples
@@ -128,7 +128,7 @@ plot_CV_corr <- function(cv_data, obs, pred, model_name) {
     ggplot2::coord_fixed() +
     ggplot2::geom_abline(intercept = 0, slope = 1, color = "blue") +
     ggplot2::labs(title = paste0("Time-sliced CV for ", model_name),
-         x = "EPA NPH",
+         x = "Reference PM2.5",
          y = "Predicted PM2.5") +
     ggplot2::theme_bw()
 }

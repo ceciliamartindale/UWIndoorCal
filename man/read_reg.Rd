@@ -2,7 +2,7 @@
 % Please edit documentation in R/reg_clean.R
 \name{read_reg}
 \alias{read_reg}
-\title{Read in regulatory data, filter low values, set datetime interval}
+\title{Read in reference data, filter low values, set datetime interval}
 \usage{
 read_reg(
   path,
@@ -17,36 +17,42 @@ read_reg(
 )
 }
 \arguments{
-\item{path}{path to regulatory csv files. It is probably worth reading in
+\item{path}{path to reference csv files. It is probably worth reading in
 one csv file using read_csv to get an idea of the structure and time formatting
-before loading in a list.}
+before loading in a list. Sub-folders will also be loaded.}
 
-\item{timezoneval}{the timezone local to where the regulatory data was collected.
+\item{timezoneval}{the timezone local to where the reference data was collected.
 To get the list of all timezone names, use OlsonNames().}
 
-\item{timezone_etc}{the timezone local to where the regulatory data was collected
+\item{timezone_etc}{the timezone local to where the reference data was collected
 in "Etc/GMT+8" format (the format that does not observe daylight savings time),
 as regulatory monitors generally do not observe daylight savings time.}
 
-\item{timeformat}{time format of the regulatory data (see ?strptime() for options).}
+\item{timeformat}{time format of the reference data (see ?strptime() for options).}
 
-\item{time_ind}{column index of time variable in regulatory csv file.}
+\item{time_ind}{numeric column index or column name of time variable in reference csv file.}
 
-\item{PM25_ind}{column index of PM2.5 variable in regulatory csv file.}
+\item{PM25_ind}{column index of PM2.5 variable in reference csv file.}
 
-\item{skip}{number of rows of original file to skip (see fread documentation for more).}
+\item{skip}{number of header rows of original file to skip (see fread
+documentation for more). Be sure to retain column names.}
 
-\item{avgtime}{time interval to average measurements over. The default is 60 minutes.}
+\item{avgtime}{time interval to average measurements over. The default is 60 minutes.
+We use the "ceiling time",
+which would mean that for an hourly average at 1PM, we average the measurements
+collected between 12:01PM and 1PM.}
 
-\item{low_threshold}{Lower threshold to filter out. Default is 2 ug/m^3 as this
-is the limit of the detection for many nephelometers.}
+\item{low_threshold}{Lower threshold to filter out. Default is 2 ug/m^3. We
+recommend inspecting your data and equipment limit of detection well to
+determine an appropriate threshold value for cleaning.}
 }
 \value{
-a dataframe of regulatory data ready for use in calibration with station
-names, UTC time, and local time.
+a dataframe of reference measurements ready for use in calibration with
+station names, UTC time, and local time. The default renames PM2.5 measurements
+to "ref_PM25".
 }
 \description{
-Read in regulatory data, filter low values, set datetime interval
+Read in reference data, filter low values, set datetime interval
 }
 \examples{
 reg_data <- read_reg("DATA/REG", "US/Pacific", "\%m/\%d/\%Y \%I:\%M:\%S \%p",

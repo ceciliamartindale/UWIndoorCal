@@ -1,9 +1,10 @@
 #' Partition data for calibration using time-sliced approach
 #'
 #' @param data air quality data for calibration. Should include channels of
-#'    interest for calibration and regulatory reference values for matching time
+#'    interest for calibration and reference values for matching time
 #'    period.
-#' @param proportion proportion of data to be used in the training dataset (example: 0.7).
+#' @param proportion proportion of data to be used in the training dataset. We
+#' recommend 0.7 (70%).
 #' @param initial_Window initial number of observations to be included in a timeslice.
 #'    If using hourly data, 168 is one week of hourly observations.
 #' @param seed_val value to set seed.
@@ -53,9 +54,9 @@ partition <- function(data, proportion, initial_Window, seed_val) {
   train_and_test_data
 }
 
-### Above: add a note saying that this assumes your data is complete. Pull from paper about
+#' ADD reference to this one above once we have a reference. Also add more from the paper.
+#' ### Above: add a note saying that this assumes your data is complete. Pull from paper about
 ## why this is important
-
 ### Add an option to only include complete data, say in the function how many rows
 ## were taken out.
 
@@ -88,8 +89,8 @@ train_model_helper <- function(formula, train_data) {
 
 #' Train multiple models and compare results.
 #'
-#' @param formulas a named list of formulas.
-#' @param train_data training dataframe.
+#' @param formulas a named list of formulas. ADD MORE FROM PAPER
+#' @param train_data training dataframe. ADD MORE FROM PAPER
 #'
 #' @returns summaries of models being trained and resampled plot of RMSE.
 #' @export
