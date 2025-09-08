@@ -79,7 +79,7 @@ pa_corr_ab <- function(data, channela=NULL, channelb=NULL, threshold=NULL, datet
   print(channela)
   print(channelb)
 
-  if (length(unique(pa_data$mac_address))==1) {
+  if (length(unique(data$mac_address))==1) {
     corrvals <- data %>% dplyr::filter(!is.na(!!sym(channela)) & !is.na(!!sym(channelb))) %>%
       dplyr::filter(!!sym(channela) < threshold & !!sym(channelb) < threshold) %>%
       dplyr::summarise(Correlation=stats::cor(!!sym(channela),!!sym(channelb)), max_a = max(!!sym(channela), na.rm=TRUE),
@@ -87,7 +87,7 @@ pa_corr_ab <- function(data, channela=NULL, channelb=NULL, threshold=NULL, datet
                        median_b = median(!!sym(channelb), na.rm=TRUE), mean_a = mean(!!sym(channela), na.rm=TRUE),
                        mean_b = mean(!!sym(channelb), na.rm=TRUE), obs = length(datetime))
   }
-  if (length(unique(pa_data$mac_address)) > 1) {
+  if (length(unique(data$mac_address)) > 1) {
     corrvals <- data %>% dplyr::filter(!is.na(!!sym(channela)) & !is.na(!!sym(channelb))) %>%
       dplyr::filter(!!sym(channela) < threshold & !!sym(channelb) < threshold) %>%
       dplyr::group_by(mac_address) %>%
@@ -163,10 +163,10 @@ pa_timeseries <- function(data, timescale, channela=NULL, channelb=NULL) {
 
   ggplot2::ggplot() +
     ggplot2::ggtitle("Time series inspection") +
-    ggplot2::geom_point(data= data,
+    ggplot2::geom_point(data,
           mapping=ggplot2::aes(x=datetime, y=!!sym(channela), color = as.character(channela)),
           pch=".", size =1.5, alpha=0.5) +
-    ggplot2::geom_point(data=data,
+    ggplot2::geom_point(data,
           mapping=ggplot2::aes(x=datetime, y=!!sym(channelb), color = as.character(channelb)),
                pch=".", size =1.5, alpha=0.5) +
     ggplot2::xlab("Observation Month") + ggplot2::ylab("PM2.5 Concentration (ug/m3)") +
