@@ -22,5 +22,6 @@ calibrated PA data
 Calibrate PA data based on regression model
 }
 \examples{
-to add
+# This assumes that the data has already been inspected
+calibrated_PA_data <- calibrate_PA_data(cal_data, select_model)
 }

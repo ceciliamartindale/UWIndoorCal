@@ -5,7 +5,7 @@
 \title{Use Lance Wallace's ALT method to correct PurpleAir measurements (with a
 default calibration factor of 3).}
 \usage{
-calibrate_ALT_method(data, cf)
+calibrate_ALT_method(data, cf = NULL)
 }
 \arguments{
 \item{data}{cleaned PurpleAir data with averaged count channels}
@@ -21,7 +21,7 @@ Use Lance Wallace's ALT method to correct PurpleAir measurements (with a
 default calibration factor of 3).
 }
 \examples{
-This assumes that the data has already been inspected.
-cleaned_pa <- prep_pa_data(pa_df)
-ALT_PA_data <- correct_ALT_method(cleaned_pa)
+# This assumes that the data has already been inspected.
+ALT_PA_data <- calibrate_ALT_method(cal_data)
+ALT_PA_data <- calibrate_ALT_method(cal_data, 3.4)
 }

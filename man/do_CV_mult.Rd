@@ -22,13 +22,14 @@ dataframe with CV_preds and AIC columns for each variable
 Do cross-validation with multiple formulas.
 }
 \examples{
-formulas <- list(formula1 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
-   current_humidity_outdoor + I(current_humidity^2) +
+formulas <- list(formula1 = ref_PM25 ~ 0 + pm2_5_cf_ave +
+   current_humidity + I(current_humidity^2) +
    current_temp_f + as.factor(season),
-                 formula2 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
+                 formula2 = ref_PM25 ~ 0 + pm2_5_cf_ave +
    current_humidity + current_temp_f + as.factor(season),
-                 formula3 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
+                 formula3 = ref_PM25 ~ 0 + pm2_5_cf_ave +
    current_temp_f + as.factor(season),
-                 formula4 = NPH_PM25 ~ 0 + pm2_5_cf_ave + as.factor(season))
+                 formula4 = ref_PM25 ~ 0 + pm2_5_cf_ave + as.factor(season))
+train_data <- train_test$train
 cv_data <- do_CV_mult(train_data, "train_index", "select_index", formulas)
 }

@@ -5,7 +5,7 @@
 \title{ADD reference to this one above once we have a reference. Also add more from the paper.
 \subsection{Above: add a note saying that this assumes your data is complete. Pull from paper about}{
 
-Helper function to train models. Can be used to train an individual model.
+Helper function to train models. Can also be used to train an individual model.
 }}
 \usage{
 train_model_helper(formula, train_data)
@@ -22,13 +22,13 @@ results of the model
 ADD reference to this one above once we have a reference. Also add more from the paper.
 \subsection{Above: add a note saying that this assumes your data is complete. Pull from paper about}{
 
-Helper function to train models. Can be used to train an individual model.
+Helper function to train models. Can also be used to train an individual model.
 }
 }
 \examples{
 train_test_data <- partition(cal_data, 0.7, 168, 5)
 train_data <- train_test_data$train
-individual_model <- train_model_helper(formula=NPH_PM25 ~ 0 + pm2_5_cf_ave +
+individual_model <- train_model_helper(formula=ref_PM25 ~ 0 + pm2_5_cf_ave +
    current_humidity_outdoor +
    I(current_humidity_outdoor^2)+
    current_temp_f_outdoor +

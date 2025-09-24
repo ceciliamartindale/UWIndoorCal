@@ -50,7 +50,7 @@ a and b channels and obvious dysfunction before this function.
 Prepare PurpleAir data for calibration
 }
 \examples{
-pa_data_cal <- prep_pa_data(pa_data)
-pa_data_cal <- prep_pa_data(pa_data, channel="pm2.5_aqi_cf_ave", low_threshold=0,
+pa_data_cal <- prep_pa_data(pa_unclean)
+pa_data_cal <- prep_pa_data(pa_unclean, channel="pm2.5_aqi_cf_ave", low_threshold=0,
  high_threshold=300)
 }

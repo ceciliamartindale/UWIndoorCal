@@ -8,11 +8,27 @@
 #' @export
 #'
 #' @examples
-#' pa_data <- read_pa("Project/Data", "US/Pacific")
+#' pa_data <- read_pa("data/PA", "US/Pacific")
 read_pa <- function(path, timezoneval) {
+  # column names needed
+  pa_cols <- c("current_temp_f","current_humidity","current_dewpoint_f",
+               "pressure", "adc", "mem", "rssi", "uptime", "pm1_0_cf_1",
+               "pm2_5_cf_1","pm10_0_cf_1","pm1_0_atm", "pm2_5_atm","pm10_0_atm",
+               "pm2.5_aqi_cf_1", "pm2.5_aqi_atm", "p_0_3_um", "p_0_5_um",
+               "p_1_0_um", "p_2_5_um","p_5_0_um", "p_10_0_um","pm1_0_cf_1_b",
+               "pm2_5_cf_1_b", "pm10_0_cf_1_b", "pm1_0_atm_b" ,"pm2_5_atm_b",
+               "pm10_0_atm_b","pm2.5_aqi_cf_1_b","pm2.5_aqi_atm_b","p_0_3_um_b",
+               "p_0_5_um_b","p_1_0_um_b","p_2_5_um_b","p_5_0_um_b","p_10_0_um_b",
+               "gas")
+
   pa.files <- list.files(path, recursive=T, full.names = T)
-  pa <- lapply(pa.files, data.table::fread) %>% data.table::rbindlist() %>%
-    dplyr::mutate(current_temp_f = as.numeric(current_temp_f),
+  pa <- lapply(pa.files, data.table::fread) %>% data.table::rbindlist()
+
+  # warning message for not having all the columns
+  ifelse(pa_cols %in% colnames(pa) %>% unique() == TRUE, print("All variables present."),
+         print("Missing necessary columns - check source data."))
+
+  pa <- pa %>% dplyr::mutate(current_temp_f = as.numeric(current_temp_f),
            current_humidity = as.numeric(current_humidity),
            current_dewpoint_f = as.numeric(current_dewpoint_f),
            pressure = as.numeric(pressure), adc = as.numeric(adc),
@@ -40,16 +56,13 @@ read_pa <- function(path, timezoneval) {
            p_2_5_um_b = as.numeric(p_2_5_um_b),
            p_5_0_um_b = as.numeric(p_5_0_um_b),
            p_10_0_um_b = as.numeric(p_10_0_um_b),
-           gas=as.numeric(gas))
-  # creating UTC datetime
-  pa[, datetimeUTC := as.POSIXct(UTCDateTime,  tz = "GMT",
-                                 format="%Y/%m/%dT%H:%M:%Sz")]
-  # creating datetime in local time zone, set using the timezoneval variable
-  pa[, datetime := as.POSIXct(format(datetimeUTC,  tz = timezoneval))]
+           gas=as.numeric(gas),
+           datetimeUTC = as.POSIXct(UTCDateTime,  tz = "GMT",
+                                    format="%Y/%m/%dT%H:%M:%Sz"),
+           datetime = as.POSIXct(format(datetimeUTC,  tz = timezoneval)))
+
   pa
 }
-
-## TO ADD: error catching
 
 #' Get correlation of a and b channels by machine address
 #'
@@ -65,8 +78,8 @@ read_pa <- function(path, timezoneval) {
 #' @export
 #'
 #' @examples
-#' pa_corr_ab(data, channela=pm2_5_atm, channelb=pm2_5_atm_b, threshold=500)
-#' pa_corr_ab(data, threshold=150, datetime=UTCDateTime)
+#' pa_corr_ab(pa_unclean, channela="pm2_5_atm", channelb="pm2_5_atm_b", threshold=500)
+#' pa_corr_ab(pa_unclean, threshold=150, datetime=UTCDateTime)
 pa_corr_ab <- function(data, channela=NULL, channelb=NULL, threshold=NULL, datetime=NULL) {
   if (is_null(channela)) {
     channela <- rlang::eval_tidy("pm2_5_cf_1", data)
@@ -111,25 +124,25 @@ pa_corr_ab <- function(data, channela=NULL, channelb=NULL, threshold=NULL, datet
 #' @export
 #'
 #' @examples
-#' pa_corr_plot(pa_data)
+#' pa_corr_plot(pa_unclean)
 #'
-#' pa_corr_plot(pa_data, "pm2_5_atm", "pm2_5_atm_b")
+#' pa_corr_plot(pa_unclean, "pm2_5_atm", "pm2_5_atm_b")
 pa_corr_plot <- function(data, channela=NULL, channelb=NULL, threshold=NULL) {
   if (is_null(channela)) {
     channela <- rlang::eval_tidy("pm2_5_cf_1", data)
-    } else (channela <- rlang::eval_tidy(ensym(channela), data))
+    } else (channela <- rlang::eval_tidy(sym(channela), data))
   if (is_null(channelb)) {
     channelb <- rlang::eval_tidy("pm2_5_cf_1_b", data)
-  } else (channelb <- rlang::eval_tidy(ensym(channelb), data))
+  } else (channelb <- rlang::eval_tidy(sym(channelb), data))
 
   if (is_null(threshold)) {
-    data <- data %>% dplyr::filter(!!sym(channela) < 500 & !!sym(channelb) < 500)
-  } else (data <- data %>% dplyr::filter(!!sym(channela) < threshold & !!sym(channelb) < threshold))
+    data <- data %>% dplyr::filter(channela < 500 & channelb < 500)
+  } else (data <- data %>% dplyr::filter(channela < threshold & channelb < threshold))
 
   labx <- data %>% select(channela) %>% max(na.rm=T)/1.5
   laby <- data %>% select(channela) %>% max(na.rm=T)/4
 
-  ggplot2::ggplot(data, ggplot2::aes(x=!!sym(channela), y=!!sym(channelb)))+
+  ggplot2::ggplot(data, ggplot2::aes(x=!!ensym(channela), y=!!ensym(channelb)))+
   ggplot2::geom_point(pch=1)+ ggplot2:: ggtitle("PM2.5 Channel Agreement") +
   ggplot2::geom_smooth(method="lm", color="black") +
   ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
@@ -151,8 +164,8 @@ pa_corr_plot <- function(data, channela=NULL, channelb=NULL, threshold=NULL) {
 #' @export
 #'
 #' @examples
-#' pa_timeseries(pa_data, "1 month")
-#' pa_timeseries(pa_data, "3 weeks")
+#' pa_timeseries(pa_unclean, "1 month")
+#' pa_timeseries(pa_unclean, "3 weeks")
 pa_timeseries <- function(data, timescale, channela=NULL, channelb=NULL) {
   if (is_null(channela)) {
     channela <- rlang::eval_tidy("pm2_5_cf_1", data)
@@ -206,8 +219,8 @@ pa_timeseries <- function(data, timescale, channela=NULL, channelb=NULL) {
 #' @export
 #'
 #' @examples
-#' pa_data_cal <- prep_pa_data(pa_data)
-#' pa_data_cal <- prep_pa_data(pa_data, channel="pm2.5_aqi_cf_ave", low_threshold=0,
+#' pa_data_cal <- prep_pa_data(pa_unclean)
+#' pa_data_cal <- prep_pa_data(pa_unclean, channel="pm2.5_aqi_cf_ave", low_threshold=0,
 #'  high_threshold=300)
 prep_pa_data <- function(data, channel="pm2_5_cf_ave", low_threshold=NULL, high_threshold=NULL, avgtime=NULL,
                          station=NULL) {
@@ -217,7 +230,8 @@ prep_pa_data <- function(data, channel="pm2_5_cf_ave", low_threshold=NULL, high_
 
   channelspa = colnames(data)[13:40]
 
-  data <- data[,datetimehr := lubridate::ceiling_date(datetime, avgtime)]
+  data <- data %>%
+    dplyr::mutate(datetimehr=lubridate::ceiling_date(datetime, avgtime))
   data <- data[, lapply(.SD, mean, na.rm = TRUE),
                                   by = c("mac_address", "datetimehr"),
                                   .SDcols = c("current_dewpoint_f",

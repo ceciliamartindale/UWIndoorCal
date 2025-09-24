@@ -21,6 +21,7 @@ Imports:
     con2aqi,
     data.table,
     dplyr,
+    here,
     ggplot2,
     ggpubr,
     glue,
@@ -36,3 +37,6 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
+Depends: 
+    R (>= 3.5)
+LazyData: true
