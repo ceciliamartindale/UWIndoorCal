@@ -22,6 +22,6 @@ timeseries plots of channel A and channel B on the same plot
 Plot time series of A and B channels
 }
 \examples{
-pa_timeseries(pa_data, "1 month")
-pa_timeseries(pa_data, "3 weeks")
+pa_timeseries(pa_unclean, "1 month")
+pa_timeseries(pa_unclean, "3 weeks")
 }

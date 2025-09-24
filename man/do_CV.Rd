@@ -23,7 +23,8 @@ these are the out-of-sample predictions
 Do cross-validation ADD language from paper
 }
 \examples{
-formula <- NPH_PM25 ~ 0 + p_0_3_um_ave + p_0_5_um_ave + p_1_0_um_ave +
+formula <- ref_PM25 ~ 0 + p_0_3_um_ave + p_0_5_um_ave + p_1_0_um_ave +
     p_2_5_um_ave + current_temp_f
+train_data <- train_test$train
 do_CV(train_data, id = "train_index", group = "select_index", formula)
 }

@@ -22,5 +22,5 @@ plot reference vs. predicted PM2.5
 Plot the correlation of the reference PM2.5 versus the predicted calibration.
 }
 \examples{
-plot_CV_corr(cv_merged, NPH_PM25, cvpreds_model_3, "Model 3")
+plot_CV_corr(cv_merged, ref_PM25, cvpreds_model_3, "Model 3")
 }

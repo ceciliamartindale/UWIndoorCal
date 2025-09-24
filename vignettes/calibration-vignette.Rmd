@@ -7,7 +7,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -39,8 +39,8 @@ To read in the data, we will use the read_pa function to read raw PurpleAir file
 The read_pa function is designed to read many PurpleAir files at once. It is useful to examine one file separately to get an idea of the data structure. This function has just two parameters: the path to the PurpleAir data and the target time zone. 
 
 ```{r read-pa-data}
-pa_path <- here("DATA/StP_testing_PA")
-pa_data <- read_pa(here("DATA/StP_testing_PA/Outdoor"), "US/Pacific")
+pa_path <- here::here("DATA/StP_testing_PA")
+pa_data <- read_pa(here::here("DATA/StP_testing_PA/Outdoor"), "US/Pacific")
 
 # Examine data to see what variables there are and what format those variables are in.
 glimpse(pa_data)
@@ -55,8 +55,8 @@ For this example, we use data obtained from the Puget Sound Clean Air Agency Air
 It is very important to look at the file before reading in the regulatory data, so that you know what you need to input as parameters.
 
 ```{r read-reg-data}
-reg_path <- here("DATA/StP_testing_REG")
-reg_data <- read_reg(here("DATA/StP_testing_REG"), timezoneval = "US/Pacific",
+reg_path <- here::here("data/StP_testing_REG")
+reg_data <- read_reg(here::here("data/StP_testing_REG"), timezoneval = "US/Pacific",
                      "Etc/GMT+8","%m/%d/%Y %I:%M:%S %p", time_ind=1, 
                      PM25_ind = 2, skip =8, low_threshold = 2)
 
@@ -84,14 +84,14 @@ train_test <- partition(cal_data, 0.7, 168, 5)
 
 train_data <- train_test$train
 
-formulas <- list(formula1 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
+formulas <- list(formula1 = ref_PM25 ~ 0 + pm2_5_cf_ave +
     current_humidity + I(current_humidity^2) +
     current_temp_f + as.factor(season),
-                  formula2 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
+                  formula2 = ref_PM25 ~ 0 + pm2_5_cf_ave +
     current_humidity + current_temp_f + as.factor(season),
-                  formula3 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
+                  formula3 = ref_PM25 ~ 0 + pm2_5_cf_ave +
     current_temp_f + as.factor(season),
-                  formula4 = NPH_PM25 ~ 0 + pm2_5_cf_ave + as.factor(season))
+                  formula4 = ref_PM25 ~ 0 + pm2_5_cf_ave + as.factor(season))
 
 train_models(formulas, train_data)
 ```
@@ -99,5 +99,20 @@ train_models(formulas, train_data)
 ```{r model-CV}
 cv_data <- do_CV_mult(train_data, "train_index", "select_index", formulas)
 
-plot_CV_corr(cv_data, "NPH_PM25", "cvpreds_model_3", "Model 3")
+get_MSE(cv_data$ref_PM25, cv_data$cvpreds_model_1, cv_data$AIC_model_1)
+rbind(get_MSE(cv_data$ref_PM25, cv_data$cvpreds_model_1, cv_data$AIC_model_1),
+  get_MSE(cv_data$ref_PM25, cv_data$cvpreds_model_2, cv_data$AIC_model_2),
+  get_MSE(cv_data$ref_PM25, cv_data$cvpreds_model_3, cv_data$AIC_model_3),
+  get_MSE(cv_data$ref_PM25, cv_data$cvpreds_model_4, cv_data$AIC_model_4))
+
+plot_CV_corr(cv_data, "ref_PM25", "cvpreds_model_2", "Model 2")
+
+select_model <- train_model_helper(formulas[[2]], train_data)
 ```
+
+```{r predict-testing}
+test_data <- train_test$test
+test_data <- test_data %>% 
+  mutate(predictions_selected = predict(select_model, newdata = test_data))
+```
+

@@ -20,9 +20,19 @@ dataframe of RMSE, MSE-based R^2, and AIC.
 Get mean-squared error (MSE)
 }
 \examples{
-one_MSE <- get_MSE(train_data_CV$NPH_PM25, train_data_CV$cvpreds_model1, train_data_CV$AIC_model1)
-rbind(get_MSE(train_data_CV$NPH_PM25, train_data_CV$cvpreds_model_1, train_data_CV$AIC_model_1),
-  get_MSE(train_data_CV$NPH_PM25, train_data_CV$cvpreds_model_2, train_data_CV$AIC_model_2),
-  get_MSE(train_data_CV$NPH_PM25, train_data_CV$cvpreds_model_3, train_data_CV$AIC_model_3),
-  get_MSE(train_data_CV$NPH_PM25, train_data_CV$cvpreds_model_4, train_data_CV$AIC_model_4))
+formulas <- list(formula1 = ref_PM25 ~ 0 + pm2_5_cf_ave +
+   current_humidity + I(current_humidity^2) +
+   current_temp_f + as.factor(season),
+                 formula2 = ref_PM25 ~ 0 + pm2_5_cf_ave +
+   current_humidity + current_temp_f + as.factor(season),
+                 formula3 = ref_PM25 ~ 0 + pm2_5_cf_ave +
+   current_temp_f + as.factor(season),
+                 formula4 = ref_PM25 ~ 0 + pm2_5_cf_ave + as.factor(season))
+train_data <- train_test$train
+train_data_CV <- do_CV_mult(train_data, "train_index", "select_index", formulas)
+one_MSE <- get_MSE(train_data_CV$ref_PM25, train_data_CV$cvpreds_model_1, train_data_CV$AIC_model_1)
+rbind(get_MSE(train_data_CV$ref_PM25, train_data_CV$cvpreds_model_1, train_data_CV$AIC_model_1),
+  get_MSE(train_data_CV$ref_PM25, train_data_CV$cvpreds_model_2, train_data_CV$AIC_model_2),
+  get_MSE(train_data_CV$ref_PM25, train_data_CV$cvpreds_model_3, train_data_CV$AIC_model_3),
+  get_MSE(train_data_CV$ref_PM25, train_data_CV$cvpreds_model_4, train_data_CV$AIC_model_4))
 }

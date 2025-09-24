@@ -22,7 +22,7 @@ plot of correlation of A and B channels.
 Plot correlation of A and B channels
 }
 \examples{
-pa_corr_plot(pa_data)
+pa_corr_plot(pa_unclean)
 
-pa_corr_plot(pa_data, "pm2_5_atm", "pm2_5_atm_b")
+pa_corr_plot(pa_unclean, "pm2_5_atm", "pm2_5_atm_b")
 }

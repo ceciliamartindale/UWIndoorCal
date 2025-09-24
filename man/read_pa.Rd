@@ -19,5 +19,5 @@ dataframe of PurpleAir observations
 Read in PurpleAir files
 }
 \examples{
-pa_data <- read_pa("Project/Data", "US/Pacific")
+pa_data <- read_pa("data/PA", "US/Pacific")
 }

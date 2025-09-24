@@ -39,9 +39,11 @@ read_reg <- function(path, timezoneval, timezone_etc, timeformat, time_ind,
   reg.files <- list.files(path, recursive=T, full.names = T)
   data <- lapply(reg.files, data.table::fread, skip = skip)
   data <- lapply(1:length(data), FUN=function(i){
-      colnames(data[[i]])[time_ind] <- "datetime"
-      colnames(data[[i]])[PM25_ind] <- "ref_PM25"
-      dplyr::mutate(data[[i]], station = basename(dirname(reg.files[[i]])))
+    data[[i]] %>% dplyr::rename("ref_PM25" = PM25_ind,
+                                      "datetime" = time_ind) %>%
+      dplyr::mutate(station = basename(dirname(reg.files[[i]])))
+      # colnames(data[[i]])[time_ind] <- "datetime"
+      # colnames(data[[i]])[PM25_ind] <- "ref_PM25"
       }) %>%
     data.table::rbindlist()
 
@@ -51,10 +53,11 @@ read_reg <- function(path, timezoneval, timezone_etc, timeformat, time_ind,
     dplyr::mutate(datetime=as.POSIXct(datetime, tz=timezone_etc, format="%m/%d/%Y %I:%M:%S %p")) %>%
     dplyr::mutate(datetime=as.POSIXct(format(datetime, tz=timezoneval)),
                   datetimeUTC=as.POSIXct(datetime, tz="UTC")) %>%
-    dplyr::filter(NPH_PM25 > low_threshold)
+    dplyr::filter(ref_PM25 > low_threshold)
 
   if(is_null(avgtime)) {avgtime="60 min"}
-  data <- data[,datetimehr := lubridate::ceiling_date(datetime, avgtime)]
+  data <- data %>%
+    dplyr::mutate(datetimehr = lubridate::ceiling_date(datetime, avgtime))
 
 }
 
@@ -85,4 +88,6 @@ merge_reg_pa <- function(data_1, data_2, add_season, time_var=NULL) {
 
   if(add_season==1) {
     data <- data %>% dplyr::mutate(season=data.table::quarter(datetimehr))}
+
+  data <- data %>% dplyr::filter(!is.na(datetimehr))
 }

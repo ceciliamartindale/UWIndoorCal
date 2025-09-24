@@ -48,7 +48,7 @@ partition <- function(data, proportion, initial_Window, seed_val) {
     dplyr::ungroup()
 
 # create testing data
-  test_data <- data[-train_indices, ] #%>% dplyr::filter(NPH_PM25 >= 2)
+  test_data <- data[-train_indices, ] #%>% dplyr::filter(ref_PM25 >= 2)
 
   train_and_test_data <- list(train= train_data, test=test_data)
   train_and_test_data
@@ -60,7 +60,7 @@ partition <- function(data, proportion, initial_Window, seed_val) {
 ### Add an option to only include complete data, say in the function how many rows
 ## were taken out.
 
-#' Helper function to train models. Can be used to train an individual model.
+#' Helper function to train models. Can also be used to train an individual model.
 #'
 #' @param formula Regression formula for use in calibration.
 #' @param train_data Training dataframe.
@@ -71,7 +71,7 @@ partition <- function(data, proportion, initial_Window, seed_val) {
 #' @examples
 #' train_test_data <- partition(cal_data, 0.7, 168, 5)
 #' train_data <- train_test_data$train
-#' individual_model <- train_model_helper(formula=NPH_PM25 ~ 0 + pm2_5_cf_ave +
+#' individual_model <- train_model_helper(formula=ref_PM25 ~ 0 + pm2_5_cf_ave +
 #'    current_humidity_outdoor +
 #'    I(current_humidity_outdoor^2)+
 #'    current_temp_f_outdoor +
@@ -98,14 +98,14 @@ train_model_helper <- function(formula, train_data) {
 #' @examples
 #' train_test_data <- partition(cal_data, 0.7, 168, 5)
 #' train_data <- train_test_data$train
-#' formulas <- list(formula1 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
+#' formulas <- list(formula1 = ref_PM25 ~ 0 + pm2_5_cf_ave +
 #'    current_humidity + I(current_humidity^2) +
 #'    current_temp_f + as.factor(season),
-#'                  formula2 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
+#'                  formula2 = ref_PM25 ~ 0 + pm2_5_cf_ave +
 #'    current_humidity + current_temp_f + as.factor(season),
-#'                  formula3 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
+#'                  formula3 = ref_PM25 ~ 0 + pm2_5_cf_ave +
 #'    current_temp_f + as.factor(season),
-#'                  formula4 = NPH_PM25 ~ 0 + pm2_5_cf_ave + as.factor(season))
+#'                  formula4 = ref_PM25 ~ 0 + pm2_5_cf_ave + as.factor(season))
 #' train_models(formulas, train_data)
 train_models <- function(formulas, train_data) {
   models <- purrr::map(formulas, \(f) train_model_helper(f, train_data))
@@ -118,4 +118,26 @@ train_models <- function(formulas, train_data) {
   lattice::dotplot(resamps, metric = "RMSE")
 }
 
-# get results of trained models
+#' Predict PM2.5 using selected model and testing data, display performance metrics
+#'
+#' @param test_data test data obtained by partitioning full dataset
+#' @param model selected calibration model
+#'
+#' @returns plot of observed versus predicted PM2.5
+#' @export
+#'
+#' @examples
+#' test_data <- train_test$test
+#' model_test_performance(test_data, select_model)
+model_test_performance <- function(test_data, model) {
+  test_data <- test_data %>% dplyr::mutate(predictions_selected =
+                               predict(model, newdata = test_data))
+  # Calculate performance metrics
+  performance <- caret::postResample(test_data$predictions_selected,
+                               test_data$ref_PM25)
+
+  plot(test_data$predictions_selected,
+       test_data$ref_PM25) + abline(0,1)
+
+  performance
+}
