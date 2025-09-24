@@ -20,13 +20,13 @@ Train multiple models and compare results.
 \examples{
 train_test_data <- partition(cal_data, 0.7, 168, 5)
 train_data <- train_test_data$train
-formulas <- list(formula1 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
+formulas <- list(formula1 = ref_PM25 ~ 0 + pm2_5_cf_ave +
    current_humidity + I(current_humidity^2) +
    current_temp_f + as.factor(season),
-                 formula2 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
+                 formula2 = ref_PM25 ~ 0 + pm2_5_cf_ave +
    current_humidity + current_temp_f + as.factor(season),
-                 formula3 = NPH_PM25 ~ 0 + pm2_5_cf_ave +
+                 formula3 = ref_PM25 ~ 0 + pm2_5_cf_ave +
    current_temp_f + as.factor(season),
-                 formula4 = NPH_PM25 ~ 0 + pm2_5_cf_ave + as.factor(season))
+                 formula4 = ref_PM25 ~ 0 + pm2_5_cf_ave + as.factor(season))
 train_models(formulas, train_data)
 }
