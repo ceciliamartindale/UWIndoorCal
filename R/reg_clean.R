@@ -1,8 +1,9 @@
 #' Read in reference data, filter low values, set datetime interval
 #'
 #' @param path path to reference csv files. It is probably worth reading in
-#'    one csv file using read_csv to get an idea of the structure and time formatting
-#'    before loading in a list. Sub-folders will also be loaded.
+#'    one individual csv file using read_csv to get an idea of the structure and
+#'    time formatting before loading in a list. Data for one reference station
+#'    should be in a folder with that station name. Sub-folders will also be loaded.
 #' @param timezoneval the timezone local to where the reference data was collected.
 #'     To get the list of all timezone names, use OlsonNames().
 #' @param timezone_etc the timezone local to where the reference data was collected
@@ -27,7 +28,8 @@
 #' @export
 #'
 #' @examples
-#' reg_data <- read_reg("DATA/REG", "US/Pacific", "%m/%d/%Y %I:%M:%S %p",
+#' path <- system.file("extdata/REG", package = "lcscal")
+#' reg_data <- read_reg(path, "US/Pacific", "Etc/GMT+8", "%m/%d/%Y %I:%M:%S %p",
 #'   time_ind=1, PM25_ind=2,skip=8)
 read_reg <- function(path, timezoneval, timezone_etc, timeformat, time_ind,
                      PM25_ind, skip=NULL, avgtime=NULL, low_threshold=NULL) {
@@ -77,7 +79,7 @@ read_reg <- function(path, timezoneval, timezone_etc, timeformat, time_ind,
 #' @examples
 #' cal_data <- merge_reg_pa(pa_data, reg_data, add_season=1)
 merge_reg_pa <- function(data_1, data_2, add_season, time_var=NULL) {
-  if(!is_null(time_var)) {
+  if(!is.null(time_var)) {
     data_1 <- data_1 %>% dplyr::rename(datetimehr=time_var)
   }
 

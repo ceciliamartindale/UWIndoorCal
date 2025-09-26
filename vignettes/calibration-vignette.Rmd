@@ -39,8 +39,8 @@ To read in the data, we will use the read_pa function to read raw PurpleAir file
 The read_pa function is designed to read many PurpleAir files at once. It is useful to examine one file separately to get an idea of the data structure. This function has just two parameters: the path to the PurpleAir data and the target time zone. 
 
 ```{r read-pa-data}
-pa_path <- here::here("DATA/StP_testing_PA")
-pa_data <- read_pa(here::here("DATA/StP_testing_PA/Outdoor"), "US/Pacific")
+pa_path <- here::here("inst/extdata/PA_DATA")
+pa_data <- read_pa(pa_path, "US/Pacific")
 
 # Examine data to see what variables there are and what format those variables are in.
 glimpse(pa_data)
@@ -55,8 +55,8 @@ For this example, we use data obtained from the Puget Sound Clean Air Agency Air
 It is very important to look at the file before reading in the regulatory data, so that you know what you need to input as parameters.
 
 ```{r read-reg-data}
-reg_path <- here::here("data/StP_testing_REG")
-reg_data <- read_reg(here::here("data/StP_testing_REG"), timezoneval = "US/Pacific",
+reg_path <- here::here("inst/extdata/REG")
+reg_data <- read_reg(reg_path, timezoneval = "US/Pacific",
                      "Etc/GMT+8","%m/%d/%Y %I:%M:%S %p", time_ind=1, 
                      PM25_ind = 2, skip =8, low_threshold = 2)
 

@@ -85,3 +85,19 @@
 #' }
 #' @source Martindale et al 2025 (DOI to come)
 "select_model"
+
+#' Cross-validated merged data
+#'
+#' A subset of data from Martindale et al 2025 to be used in examples.
+#' This is not the selected model from the paper -- it is only to be used in examples.
+#'
+#' @format ## `cv_data`
+#' A dataframe of 4,704 rows and 40 columns.
+#' \describe{
+#'   \item{datetime}{Date time}
+#'   \item{ref_PM25}{Reference PM2.5}
+#'   \item{station}{Reference station}
+#'   ...
+#' }
+#' @source Martindale et al 2025 (DOI to come)
+"cv_data"

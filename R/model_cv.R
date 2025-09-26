@@ -125,7 +125,7 @@ get_MSE <- function(obs,pred, AIC_var) {
 #' @export
 #'
 #' @examples
-#' plot_CV_corr(cv_merged, ref_PM25, cvpreds_model_3, "Model 3")
+#' plot_CV_corr(cv_data, "ref_PM25", "cvpreds_model_3", "Model 3")
 plot_CV_corr <- function(cv_data, obs, pred, model_name) {
   # get range for plot
   r <- cv_data %>% dplyr::select(obs, pred) %>% range()

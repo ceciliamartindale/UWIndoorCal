@@ -8,7 +8,8 @@
 #' @export
 #'
 #' @examples
-#' pa_data <- read_pa("data/PA", "US/Pacific")
+#' path <- system.file("extdata/PA_DATA", package = "lcscal")
+#' pa_data <- read_pa(path, "US/Pacific")
 read_pa <- function(path, timezoneval) {
   # column names needed
   pa_cols <- c("current_temp_f","current_humidity","current_dewpoint_f",
@@ -79,35 +80,42 @@ read_pa <- function(path, timezoneval) {
 #'
 #' @examples
 #' pa_corr_ab(pa_unclean, channela="pm2_5_atm", channelb="pm2_5_atm_b", threshold=500)
-#' pa_corr_ab(pa_unclean, threshold=150, datetime=UTCDateTime)
+#' pa_corr_ab(pa_unclean, threshold=150, datetime="UTCDateTime")
 pa_corr_ab <- function(data, channela=NULL, channelb=NULL, threshold=NULL, datetime=NULL) {
-  if (is_null(channela)) {
-    channela <- rlang::eval_tidy("pm2_5_cf_1", data)
-    } else (channela <- rlang::eval_tidy(ensym(channela), data))
-  if (is_null(channelb)) {
-    channelb <- rlang::eval_tidy("pm2_5_cf_1_b", data)
-  } else (channelb <- rlang::eval_tidy(ensym(channelb), data))
-  if (is_null(threshold)) (threshold=100)
-  if (is_null(datetime)) (datetime="datetime")
-  print(channela)
-  print(channelb)
+  if (is.null(channela)) {
+    channela <- rlang::sym("pm2_5_cf_1")
+  } else {channela <- rlang::ensym(channela) }
+  if (is.null(channelb)) {
+    channelb <- rlang::sym("pm2_5_cf_1_b")
+  } else {channelb <- rlang::ensym(channelb)}
+
+  if (is.null(threshold)) (threshold=100)
+  if (is.null(datetime)) (datetime="datetime")
+  #print(channela)
+  #print(channelb)
 
   if (length(unique(data$mac_address))==1) {
-    corrvals <- data %>% dplyr::filter(!is.na(!!sym(channela)) & !is.na(!!sym(channelb))) %>%
-      dplyr::filter(!!sym(channela) < threshold & !!sym(channelb) < threshold) %>%
-      dplyr::summarise(Correlation=stats::cor(!!sym(channela),!!sym(channelb)), max_a = max(!!sym(channela), na.rm=TRUE),
-                       max_b = max(!!sym(channelb), na.rm=TRUE), median_a = median(!!sym(channela), na.rm=TRUE),
-                       median_b = median(!!sym(channelb), na.rm=TRUE), mean_a = mean(!!sym(channela), na.rm=TRUE),
-                       mean_b = mean(!!sym(channelb), na.rm=TRUE), obs = length(datetime))
+    corrvals <- data %>% dplyr::filter(!is.na(!!channela) & !is.na(!!channelb)) %>%
+      dplyr::filter(!!channela < threshold & !!channelb < threshold) %>%
+      dplyr::summarise(Correlation=stats::cor(!!channela,!!channelb),
+                       max_a = max(!!channela, na.rm=TRUE),
+                       max_b = max(!!channelb, na.rm=TRUE),
+                       median_a = median(!!channela, na.rm=TRUE),
+                       median_b = median(!!channelb, na.rm=TRUE),
+                       mean_a = mean(!!channela, na.rm=TRUE),
+                       mean_b = mean(!!channelb, na.rm=TRUE), obs = length(datetime))
   }
   if (length(unique(data$mac_address)) > 1) {
-    corrvals <- data %>% dplyr::filter(!is.na(!!sym(channela)) & !is.na(!!sym(channelb))) %>%
-      dplyr::filter(!!sym(channela) < threshold & !!sym(channelb) < threshold) %>%
+    corrvals <- data %>% dplyr::filter(!is.na(!!channela) & !is.na(!!channelb)) %>%
+      dplyr::filter(!!channela < threshold & !!channelb < threshold) %>%
       dplyr::group_by(mac_address) %>%
-      dplyr::summarise(Correlation=stats::cor(!!sym(channela),!!sym(channelb)), max_a = max(!!sym(channela), na.rm=TRUE),
-                     max_b = max(!!sym(channelb), na.rm=TRUE), median_a = median(!!sym(channela), na.rm=TRUE),
-                     median_b = median(!!sym(channelb), na.rm=TRUE), mean_a = mean(!!sym(channela), na.rm=TRUE),
-                     mean_b = mean(!!sym(channelb), na.rm=TRUE), obs = length(datetime))
+      dplyr::summarise(Correlation=stats::cor(!!channela,!!channelb),
+                       max_a = max(!!channela, na.rm=TRUE),
+                     max_b = max(!!channelb, na.rm=TRUE),
+                     median_a = median(!!channela, na.rm=TRUE),
+                     median_b = median(!!channelb, na.rm=TRUE),
+                     mean_a = mean(!!channela, na.rm=TRUE),
+                     mean_b = mean(!!channelb, na.rm=TRUE), obs = length(datetime))
   }
 
   print(corrvals)
@@ -128,21 +136,22 @@ pa_corr_ab <- function(data, channela=NULL, channelb=NULL, threshold=NULL, datet
 #'
 #' pa_corr_plot(pa_unclean, "pm2_5_atm", "pm2_5_atm_b")
 pa_corr_plot <- function(data, channela=NULL, channelb=NULL, threshold=NULL) {
-  if (is_null(channela)) {
-    channela <- rlang::eval_tidy("pm2_5_cf_1", data)
-    } else (channela <- rlang::eval_tidy(sym(channela), data))
-  if (is_null(channelb)) {
-    channelb <- rlang::eval_tidy("pm2_5_cf_1_b", data)
-  } else (channelb <- rlang::eval_tidy(sym(channelb), data))
+
+  if (is.null(channela)) {
+    channela <- rlang::sym("pm2_5_cf_1")
+    } else {channela <- rlang::ensym(channela) }
+  if (is.null(channelb)) {
+    channelb <- rlang::sym("pm2_5_cf_1_b")
+  } else {channelb <- rlang::ensym(channelb)}
 
   if (is_null(threshold)) {
-    data <- data %>% dplyr::filter(channela < 500 & channelb < 500)
-  } else (data <- data %>% dplyr::filter(channela < threshold & channelb < threshold))
+    data <- data %>% dplyr::filter(!!channela < 500 & !!channelb < 500)
+  } else (data <- data %>% dplyr::filter(!!channela < threshold & !!channelb < threshold))
 
-  labx <- data %>% select(channela) %>% max(na.rm=T)/1.5
-  laby <- data %>% select(channela) %>% max(na.rm=T)/4
+  labx <- data %>% dplyr::select(channela) %>% max(na.rm=T)/1.5
+  laby <- data %>% dplyr::select(channela) %>% max(na.rm=T)/4
 
-  ggplot2::ggplot(data, ggplot2::aes(x=!!ensym(channela), y=!!ensym(channelb)))+
+  ggplot2::ggplot(data, ggplot2::aes(x=!!channela, y=!!channelb))+
   ggplot2::geom_point(pch=1)+ ggplot2:: ggtitle("PM2.5 Channel Agreement") +
   ggplot2::geom_smooth(method="lm", color="black") +
   ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
@@ -150,7 +159,7 @@ pa_corr_plot <- function(data, channela=NULL, channelb=NULL, threshold=NULL) {
   ggplot2::xlab(as.character(channela)) + ggplot2::ylab(as.character(channelb)) +
   ggpubr::stat_cor(ggplot2::aes(label=ggplot2::after_stat(rr.label)),
                    label.x=labx, label.y=laby) +
-    ggplot2::facet_wrap(~mac_address)
+    ggplot2::facet_wrap(~"mac_address")
 }
 
 #' Plot time series of A and B channels
@@ -167,12 +176,13 @@ pa_corr_plot <- function(data, channela=NULL, channelb=NULL, threshold=NULL) {
 #' pa_timeseries(pa_unclean, "1 month")
 #' pa_timeseries(pa_unclean, "3 weeks")
 pa_timeseries <- function(data, timescale, channela=NULL, channelb=NULL) {
-  if (is_null(channela)) {
-    channela <- rlang::eval_tidy("pm2_5_cf_1", data)
-  } else (channela <- rlang::eval_tidy(ensym(channela), data))
-  if (is_null(channelb)) {
-    channelb <- rlang::eval_tidy("pm2_5_cf_1_b", data)
-  } else (channelb <- rlang::eval_tidy(ensym(channelb), data))
+
+  if (is.null(channela)) {
+    channela <- rlang::sym("pm2_5_cf_1")
+  } else {channela <- rlang::ensym(channela) }
+  if (is.null(channelb)) {
+    channelb <- rlang::sym("pm2_5_cf_1_b")
+  } else {channelb <- rlang::ensym(channelb)}
 
   ggplot2::ggplot() +
     ggplot2::ggtitle("Time series inspection") +
@@ -186,7 +196,7 @@ pa_timeseries <- function(data, timescale, channela=NULL, channelb=NULL) {
     ggplot2::scale_x_datetime(date_breaks=timescale) +
     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5)) +
     ggplot2::theme(axis.title.y = ggplot2::element_text(vjust = 0.5)) +
-    ggplot2::facet_wrap(~mac_address)
+    ggplot2::facet_wrap(~"mac_address")
 }
 
 #' Prepare PurpleAir data for calibration
@@ -255,7 +265,7 @@ prep_pa_data <- function(data, channel="pm2_5_cf_ave", low_threshold=NULL, high_
                                  p_2_5_um_ave = (p_2_5_um+p_2_5_um_b)/2,
                                  p_5_0_um_ave = (p_5_0_um+p_5_0_um_b)/2,
                                  p_10_0_um_ave = (p_10_0_um+p_10_0_um_b)/2) %>%
-    select(-c(pm10_0_cf_1, pm10_0_cf_1_b,
+    dplyr::select(-c(pm10_0_cf_1, pm10_0_cf_1_b,
               pm10_0_atm, pm10_0_atm_b, pm2.5_aqi_atm,
               pm2.5_aqi_atm_b, pm1_0_cf_1,
               pm1_0_cf_1_b, pm1_0_atm, pm1_0_atm_b, p_0_3_um, p_0_3_um_b,

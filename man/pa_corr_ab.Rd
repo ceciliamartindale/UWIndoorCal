@@ -33,5 +33,5 @@ Get correlation of a and b channels by machine address
 }
 \examples{
 pa_corr_ab(pa_unclean, channela="pm2_5_atm", channelb="pm2_5_atm_b", threshold=500)
-pa_corr_ab(pa_unclean, threshold=150, datetime=UTCDateTime)
+pa_corr_ab(pa_unclean, threshold=150, datetime="UTCDateTime")
 }

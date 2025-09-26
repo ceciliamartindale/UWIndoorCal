@@ -18,8 +18,9 @@ read_reg(
 }
 \arguments{
 \item{path}{path to reference csv files. It is probably worth reading in
-one csv file using read_csv to get an idea of the structure and time formatting
-before loading in a list. Sub-folders will also be loaded.}
+one individual csv file using read_csv to get an idea of the structure and
+time formatting before loading in a list. Data for one reference station
+should be in a folder with that station name. Sub-folders will also be loaded.}
 
 \item{timezoneval}{the timezone local to where the reference data was collected.
 To get the list of all timezone names, use OlsonNames().}
@@ -55,6 +56,7 @@ to "ref_PM25".
 Read in reference data, filter low values, set datetime interval
 }
 \examples{
-reg_data <- read_reg("DATA/REG", "US/Pacific", "\%m/\%d/\%Y \%I:\%M:\%S \%p",
+path <- system.file("extdata/REG", package = "lcscal")
+reg_data <- read_reg(path, "US/Pacific", "Etc/GMT+8", "\%m/\%d/\%Y \%I:\%M:\%S \%p",
   time_ind=1, PM25_ind=2,skip=8)
 }

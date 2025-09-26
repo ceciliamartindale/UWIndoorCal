@@ -19,7 +19,7 @@ Train multiple models and compare results.
 }
 \examples{
 train_test_data <- partition(cal_data, 0.7, 168, 5)
-train_data <- train_test_data$train
+train_data <- train_test$train
 formulas <- list(formula1 = ref_PM25 ~ 0 + pm2_5_cf_ave +
    current_humidity + I(current_humidity^2) +
    current_temp_f + as.factor(season),
