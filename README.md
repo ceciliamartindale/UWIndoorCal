@@ -1,2 +1,4 @@
 # UWIndoorCal
-Repository for UWIndoorCal package.
+
+Repository for UWIndoorCal (low-cost air quality monitor calibration) package.
+
