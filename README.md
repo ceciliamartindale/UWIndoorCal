@@ -1,2 +1,2 @@
-# lcscal
-Repository for lcscal (low-cost sensor calibration) package.
+# UWIndoorCal
+Repository for UWIndoorCal (low-cost air quality monitor calibration) package.
