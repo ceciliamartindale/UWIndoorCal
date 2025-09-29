@@ -56,7 +56,7 @@ to "ref_PM25".
 Read in reference data, filter low values, set datetime interval
 }
 \examples{
-path <- system.file("extdata/REG", package = "lcscal")
+path <- system.file("extdata/REG", package = "UWIndoorCal")
 reg_data <- read_reg(path, "US/Pacific", "Etc/GMT+8", "\%m/\%d/\%Y \%I:\%M:\%S \%p",
   time_ind=1, PM25_ind=2,skip=8)
 }

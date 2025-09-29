@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(lcscal)
+library(UWIndoorCal)
 library(here)
 library(dplyr)
 ```

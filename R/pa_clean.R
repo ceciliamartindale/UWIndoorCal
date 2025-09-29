@@ -8,7 +8,7 @@
 #' @export
 #'
 #' @examples
-#' path <- system.file("extdata/PA_DATA", package = "lcscal")
+#' path <- system.file("extdata/PA_DATA", package = "UWIndoorCal")
 #' pa_data <- read_pa(path, "US/Pacific")
 read_pa <- function(path, timezoneval) {
   # column names needed

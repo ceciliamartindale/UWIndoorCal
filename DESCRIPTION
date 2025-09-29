@@ -1,5 +1,5 @@
-Package: lcscal
-Title: Calibrating Low-Cost Sensors Against Regulatory Monitors
+Package: UWIndoorCal
+Title: Calibrating Low-Cost Sensors Against Reference Monitors for Indoor Monitoring
 Version: 0.0.0.9000
 Authors@R: 
     c(person("Cecilia", "Martindale", email="cm763@uw.edu", role = c("aut", "cre"),

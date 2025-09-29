@@ -19,6 +19,6 @@ dataframe of PurpleAir observations
 Read in PurpleAir files
 }
 \examples{
-path <- system.file("extdata/PA_DATA", package = "lcscal")
+path <- system.file("extdata/PA_DATA", package = "UWIndoorCal")
 pa_data <- read_pa(path, "US/Pacific")
 }
