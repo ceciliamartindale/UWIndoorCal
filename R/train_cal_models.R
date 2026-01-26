@@ -35,7 +35,8 @@ partition <- function(data, proportion, initial_Window, seed_val) {
 
 # create training data
   train_data <- data[train_indices, ] %>%
-    dplyr::mutate(train_index = train_indices) %>%
+    cbind(data.frame(train_indices)) %>%
+    dplyr::rename(train_index = train_indices) %>%
     dplyr::rowwise() %>%
     dplyr::mutate(select_index = dplyr::coalesce(
       purrr::map2_dbl(min_indices, max_indices,
