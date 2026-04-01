@@ -65,6 +65,8 @@ partition <- function(data, proportion, initial_Window, seed_val) {
 #'
 #' @param formula Regression formula for use in calibration.
 #' @param train_data Training dataframe.
+#' @param model_weights A numeric vector of case weights. This argument will only affect
+#' models that allow case weights. Can also set weights to NULL.
 #'
 #' @returns results of the model
 #' @export
@@ -75,22 +77,36 @@ partition <- function(data, proportion, initial_Window, seed_val) {
 #'    current_humidity +
 #'    I(current_humidity^2)+
 #'    current_temp_f +
-#'    as.factor(season), train_data)
-train_model_helper <- function(formula, train_data) {
-  caret::train(
-    formula,
-    data = train_data,
-    method = "lm",
-    metric = "RMSE",
-    tuneGrid = expand.grid(intercept = FALSE),
-    na.action = na.exclude
-  )
+#'    as.factor(season), train_data, train_data$weight_var)
+train_model_helper <- function(formula, train_data, model_weights=NULL) {
+  if (is.null(model_weights)) {
+    caret::train(
+      formula,
+      data = train_data,
+      method = "lm",
+      metric = "RMSE",
+      tuneGrid = expand.grid(intercept = FALSE),
+      na.action = na.exclude)
+  }
+  else if (!is.null(model_weights)) {
+    caret::train(
+      formula,
+      data = train_data,
+      method = "lm",
+      metric = "RMSE",
+      tuneGrid = expand.grid(intercept = FALSE),
+      na.action = na.exclude,
+      weights = model_weights)
+  }
+
 }
 
 #' Train multiple models and compare results.
 #'
 #' @param formulas a named list of formulas. ADD MORE FROM PAPER
 #' @param train_data training dataframe. ADD MORE FROM PAPER
+#' @param model_weights A numeric vector of case weights. This argument will only affect
+#' models that allow case weights. Can also set weights to NULL.
 #'
 #' @returns summaries of models being trained and resampled plot of RMSE.
 #' @export
@@ -106,9 +122,15 @@ train_model_helper <- function(formula, train_data) {
 #'                  formula3 = ref_PM25 ~ 0 + pm2_5_cf_ave +
 #'    current_temp_f + as.factor(season),
 #'                  formula4 = ref_PM25 ~ 0 + pm2_5_cf_ave + as.factor(season))
-#' train_models(formulas, train_data)
-train_models <- function(formulas, train_data) {
-  models <- purrr::map(formulas, \(f) train_model_helper(f, train_data))
+#' train_models(formulas, train_data, train_data$weight_var)
+train_models <- function(formulas, train_data, model_weights=NULL) {
+
+  if (is.null(model_weights)) {
+    models <- purrr::map(formulas, \(f) train_model_helper(f, train_data))
+  }
+  else if (!is.null(model_weights)) {
+    models <- purrr::map(formulas, \(f) train_model_helper(f, train_data, model_weights))
+  }
 
   purrr::walk(models, ~ print(summary(.x)))
 

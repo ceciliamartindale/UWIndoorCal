@@ -4,12 +4,15 @@
 \alias{train_models}
 \title{Train multiple models and compare results.}
 \usage{
-train_models(formulas, train_data)
+train_models(formulas, train_data, model_weights = NULL)
 }
 \arguments{
 \item{formulas}{a named list of formulas. ADD MORE FROM PAPER}
 
 \item{train_data}{training dataframe. ADD MORE FROM PAPER}
+
+\item{model_weights}{A numeric vector of case weights. This argument will only affect
+models that allow case weights. Can also set weights to NULL.}
 }
 \value{
 summaries of models being trained and resampled plot of RMSE.
@@ -28,5 +31,5 @@ formulas <- list(formula1 = ref_PM25 ~ 0 + pm2_5_cf_ave +
                  formula3 = ref_PM25 ~ 0 + pm2_5_cf_ave +
    current_temp_f + as.factor(season),
                  formula4 = ref_PM25 ~ 0 + pm2_5_cf_ave + as.factor(season))
-train_models(formulas, train_data)
+train_models(formulas, train_data, train_data$weight_var)
 }

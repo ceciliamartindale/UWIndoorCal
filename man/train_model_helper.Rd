@@ -8,12 +8,15 @@
 Helper function to train models. Can also be used to train an individual model.
 }}
 \usage{
-train_model_helper(formula, train_data)
+train_model_helper(formula, train_data, model_weights = NULL)
 }
 \arguments{
 \item{formula}{Regression formula for use in calibration.}
 
 \item{train_data}{Training dataframe.}
+
+\item{model_weights}{A numeric vector of case weights. This argument will only affect
+models that allow case weights. Can also set weights to NULL.}
 }
 \value{
 results of the model
@@ -31,5 +34,5 @@ individual_model <- train_model_helper(formula=ref_PM25 ~ 0 + pm2_5_cf_ave +
    current_humidity +
    I(current_humidity^2)+
    current_temp_f +
-   as.factor(season), train_data)
+   as.factor(season), train_data, train_data$weight_var)
 }
