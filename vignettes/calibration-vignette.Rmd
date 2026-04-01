@@ -96,6 +96,26 @@ formulas <- list(formula1 = ref_PM25 ~ 0 + pm2_5_cf_ave +
 train_models(formulas, train_data)
 ```
 
+We can also incorporate model weights. This example uses random weights.
+
+```{r train-models-weights}
+train_test <- partition(cal_data, 0.7, 168, 5)
+
+train_data <- train_test$train
+train_data$random_weights <- runif(length(train_data$pm2_5_cf_ave))
+
+formulas <- list(formula1 = ref_PM25 ~ 0 + pm2_5_cf_ave +
+    current_humidity + I(current_humidity^2) +
+    current_temp_f + as.factor(season),
+                  formula2 = ref_PM25 ~ 0 + pm2_5_cf_ave +
+    current_humidity + current_temp_f + as.factor(season),
+                  formula3 = ref_PM25 ~ 0 + pm2_5_cf_ave +
+    current_temp_f + as.factor(season),
+                  formula4 = ref_PM25 ~ 0 + pm2_5_cf_ave + as.factor(season))
+
+train_models(formulas, train_data, train_data$random_weights)
+```
+
 ```{r model-CV}
 cv_data <- do_CV_mult(train_data, "train_index", "select_index", formulas)
 

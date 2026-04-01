@@ -79,25 +79,21 @@ partition <- function(data, proportion, initial_Window, seed_val) {
 #'    current_temp_f +
 #'    as.factor(season), train_data, train_data$weight_var)
 train_model_helper <- function(formula, train_data, model_weights=NULL) {
-  if (is.null(model_weights)) {
-    caret::train(
-      formula,
-      data = train_data,
-      method = "lm",
-      metric = "RMSE",
-      tuneGrid = expand.grid(intercept = FALSE),
-      na.action = na.exclude)
+
+  args <- list(
+    form = formula,
+    data = train_data,
+    method = "lm",
+    metric = "RMSE",
+    tuneGrid = expand.grid(intercept = FALSE),
+    na.action = "na.exclude"
+  )
+
+  if (!is.null(model_weights)) {
+    args$weights <- model_weights
   }
-  else if (!is.null(model_weights)) {
-    caret::train(
-      formula,
-      data = train_data,
-      method = "lm",
-      metric = "RMSE",
-      tuneGrid = expand.grid(intercept = FALSE),
-      na.action = na.exclude,
-      weights = model_weights)
-  }
+
+  do.call(caret::train, args)
 
 }
 
@@ -125,12 +121,7 @@ train_model_helper <- function(formula, train_data, model_weights=NULL) {
 #' train_models(formulas, train_data, train_data$weight_var)
 train_models <- function(formulas, train_data, model_weights=NULL) {
 
-  if (is.null(model_weights)) {
-    models <- purrr::map(formulas, \(f) train_model_helper(f, train_data))
-  }
-  else if (!is.null(model_weights)) {
-    models <- purrr::map(formulas, \(f) train_model_helper(f, train_data, model_weights))
-  }
+  models <- purrr::map(formulas, \(f) train_model_helper(f, train_data, model_weights))
 
   purrr::walk(models, ~ print(summary(.x)))
 
