@@ -1,4 +1,5 @@
-#' Do cross-validation ADD language from paper
+#' Do cross-validation based on a grouping variable. In our Martindale et al. 2026
+#' paper, we cross-validated by time-slices of data.
 #'
 #' @param data dataframe containing the training data.
 #' @param id unique variable for determining sort order of data frame

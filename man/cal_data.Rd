@@ -17,12 +17,12 @@ A data frame with 1,768 rows and 24 columns:
 }
 }
 \source{
-Martindale et al 2025 (DOI to come)
+Martindale et al 2026 (DOI to come)
 }
 \usage{
 cal_data
 }
 \description{
-A subset of data from Martindale et al 2025 to be used in examples
+A subset of data from Martindale et al 2026 to be used in examples
 }
 \keyword{datasets}

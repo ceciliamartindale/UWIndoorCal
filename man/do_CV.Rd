@@ -2,7 +2,8 @@
 % Please edit documentation in R/model_cv.R
 \name{do_CV}
 \alias{do_CV}
-\title{Do cross-validation ADD language from paper}
+\title{Do cross-validation based on a grouping variable. In our Martindale et al. 2026
+paper, we cross-validated by time-slices of data.}
 \usage{
 do_CV(data, id, group, formula)
 }
@@ -20,7 +21,8 @@ dataset with a new variable called cvpreds appended to the end;
 these are the out-of-sample predictions
 }
 \description{
-Do cross-validation ADD language from paper
+Do cross-validation based on a grouping variable. In our Martindale et al. 2026
+paper, we cross-validated by time-slices of data.
 }
 \examples{
 formula <- ref_PM25 ~ 0 + p_0_3_um_ave + p_0_5_um_ave + p_1_0_um_ave +

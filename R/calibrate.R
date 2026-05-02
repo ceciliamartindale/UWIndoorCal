@@ -1,7 +1,15 @@
 #' Calibrate PA data based on regression model
 #'
-#' @param data - to add description
-#' @param model - to add description
+#' @param data - cleaned PurpleAir data. If using UWIndoorCal::TSCal model, you
+#' need the following column names in your data: p_0_3_um_outdoor_ave, p_0_5_um_outdoor_ave,
+#' p_1_0_um_outdoor_ave, p_2_5_um_outdoor_ave, current_humidity_outdoor,
+#' season. This can be achieved using the prep_pa_data function.
+#' If using UWIndoorCal::select_model, you need the following column names in your data:
+#' ref_PM25, pm2_5_cf_ave, current_humidity, current_temp_f, and season.
+#' @param model - calibration model. TSCal model is recommended, and can be specified
+#' as UWIndoorCal::TSCal_model. You can also specify a custom model. You can also
+#' use UWIndoorCal::select_model (example model using PA-provided pm2_5_cf_ave),
+#' though this is not recommended.
 #'
 #' @returns calibrated PA data
 #' @export

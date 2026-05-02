@@ -16,12 +16,12 @@ A data frame with 5,214 rows and 5 columns:
 }
 }
 \source{
-Martindale et al 2025 (DOI to come)
+Martindale et al 2026 (DOI to come)
 }
 \usage{
 reg_data
 }
 \description{
-A subset of data from Martindale et al 2025 to be used in examples
+A subset of data from Martindale et al 2026 to be used in examples
 }
 \keyword{datasets}

@@ -17,13 +17,13 @@ A dataframe of 4,704 rows and 40 columns.
 }
 }
 \source{
-Martindale et al 2025 (DOI to come)
+Martindale et al 2026 (DOI to come)
 }
 \usage{
 cv_data
 }
 \description{
-A subset of data from Martindale et al 2025 to be used in examples.
+A subset of data from Martindale et al 2026 to be used in examples.
 This is not the selected model from the paper -- it is only to be used in examples.
 }
 \keyword{datasets}

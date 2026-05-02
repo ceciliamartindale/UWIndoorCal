@@ -22,6 +22,6 @@ Martindale et al 2025 (DOI to come)
 pa_unclean
 }
 \description{
-A subset of data from Martindale et al 2025 to be used in examples
+A subset of data from Martindale et al 2026 to be used in examples
 }
 \keyword{datasets}

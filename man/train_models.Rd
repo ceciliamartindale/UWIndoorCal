@@ -7,9 +7,21 @@
 train_models(formulas, train_data, model_weights = NULL)
 }
 \arguments{
-\item{formulas}{a named list of formulas. ADD MORE FROM PAPER}
+\item{formulas}{a named list of formulas. In the Martindale et al. 2026 paper, we
+fit a series of multivariate linear regression models, where the dependent variable
+was nephelometer-measured hourly PM2.5 mass concentrations and the independent
+variables included PNC, temperature, humidity, and season. For PNC, we tried
+different terms across three models: Model 1 included each raw count channel
+between greater than 0.3 and greater than 2.5 µm, Model 2 included the difference
+between the greater than 0.3 and greater than 2.5 count channels, and Model 3
+included the PurpleAir mass-based PM2.5 channel (PM2.5_cf).  To account for
+the nonlinear effect of humidity, we considered the quadratic term of humidity.
+Season was modeled as a factor variable by using four dummy variables; there
+was no reference as the y-intercept was set to zero.}
 
-\item{train_data}{training dataframe. ADD MORE FROM PAPER}
+\item{train_data}{training dataframe. This dataframe needs to include both the reference
+data and the PurpleAir data. See Martindale et al. 2026 for more details on QA/QC we
+used before creating training data.}
 
 \item{model_weights}{A numeric vector of case weights. This argument will only affect
 models that allow case weights. Can also set weights to NULL.}

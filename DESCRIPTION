@@ -17,11 +17,8 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports: 
     caret,
-    cli,
-    con2aqi,
     data.table,
     dplyr,
-    here,
     ggplot2,
     ggpubr,
     glue,
@@ -29,14 +26,18 @@ Imports:
     lifecycle,
     lubridate,
     magrittr,
-    plyr,
     rlang,
-    stats,
-    withr
+    stats
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    cli,
+    con2aqi,
+    here,
+    plyr,
+    withr
 VignetteBuilder: knitr
 Depends: 
     R (>= 3.5)
 LazyData: true
+LazyDataCompression: xz

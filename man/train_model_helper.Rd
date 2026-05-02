@@ -2,11 +2,9 @@
 % Please edit documentation in R/train_cal_models.R
 \name{train_model_helper}
 \alias{train_model_helper}
-\title{ADD reference to this one above once we have a reference. Also add more from the paper.
-\subsection{Above: add a note saying that this assumes your data is complete. Pull from paper about}{
-
-Helper function to train models. Can also be used to train an individual model.
-}}
+\title{Helper function to train models. Can also be used to train an individual model.
+This assumes that your data is complete and that your training data has been cleaned.
+Poor data quality will result in a worse calibration.}
 \usage{
 train_model_helper(formula, train_data, model_weights = NULL)
 }
@@ -22,11 +20,9 @@ models that allow case weights. Can also set weights to NULL.}
 results of the model
 }
 \description{
-ADD reference to this one above once we have a reference. Also add more from the paper.
-\subsection{Above: add a note saying that this assumes your data is complete. Pull from paper about}{
-
 Helper function to train models. Can also be used to train an individual model.
-}
+This assumes that your data is complete and that your training data has been cleaned.
+Poor data quality will result in a worse calibration.
 }
 \examples{
 train_data <- train_test$train
